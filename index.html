@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raider Clavier &mdash; French keyboard typing practice</title>
+<meta name="description" content="Learn to type French accents — é è à ç ê ë ô û — on a US keyboard, on either the French AZERTY or the US-International Windows layout. Drills, a timed sprint game, and a paste-in class leaderboard. Free, runs entirely in your browser.">
+<script>
+/* Light/dark follows the operating system setting. No in-page toggle by design. */
+(function(){
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  function apply(){ document.documentElement.setAttribute("data-theme", mq.matches ? "dark" : "light"); }
+  apply();
+  if (mq.addEventListener) mq.addEventListener("change", apply);
+  else if (mq.addListener) mq.addListener(apply);
+})();
+</script>
+<style>
+:root{
+  --red:#C11430;
+  --bg:#f6f6f7; --panel:#ffffff; --ink:#1b1c1f; --muted:#5d6068;
+  --line:rgba(128,128,128,.28); --soft:rgba(128,128,128,.07);
+  --key:#ffffff; --keyline:rgba(128,128,128,.40); --keyink:#1b1c1f;
+  --good:#1a7f45; --goodbg:rgba(26,127,69,.12);
+  --bad:#c0261c;  --badbg:rgba(192,38,28,.13);
+  --warn:#8a5a00; --warnbg:rgba(196,140,0,.14);
+  --gold:#a8791a;
+}
+:root[data-theme="dark"]{
+  --bg:#15161a; --panel:#1d1f24; --ink:#e9eaee; --muted:#a0a4ae;
+  --line:rgba(150,150,160,.26); --soft:rgba(160,160,175,.07);
+  --key:#24272e; --keyline:rgba(150,150,160,.34); --keyink:#e9eaee;
+  --good:#5ed693; --goodbg:rgba(94,214,147,.14);
+  --bad:#ff7d72;  --badbg:rgba(255,125,114,.15);
+  --warn:#f0c04a; --warnbg:rgba(240,192,74,.14);
+  --gold:#e8b84b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.ctr{max-width:1000px;margin:0 auto;padding:0 20px}
+.site-header{display:flex;align-items:center;gap:14px;padding:22px 0 16px;flex-wrap:wrap}
+.rj-mark{height:40px;width:auto;display:block;flex-shrink:0}
+.site-header h1{font-size:1.32rem;margin:0;font-weight:700;letter-spacing:-.01em}
+.site-header .sub{font-size:.84rem;color:var(--muted);margin-top:2px}
+.hdr-txt{flex:1;min-width:210px}
+.who{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)}
+.who input{font:inherit;font-size:.86rem;padding:6px 9px;border:1px solid var(--line);border-radius:7px;
+  background:var(--panel);color:var(--ink);width:170px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{
+  border:none;background:none;padding:10px 14px;font-size:.88rem;font-weight:650;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px
+}
+.tab:hover{color:var(--ink);border-color:var(--line)}
+.tab[aria-selected="true"]{color:var(--red);border-bottom-color:var(--red)}
+.view{display:none}
+.view.on{display:block}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0}
+h2{font-size:1.02rem;margin:0 0 10px;font-weight:700}
+h3{font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--red);margin:0 0 10px}
+p{margin:0 0 10px}
+.muted{color:var(--muted)} .small{font-size:.86rem} .tiny{font-size:.78rem}
+kbd{display:inline-block;font-family:"Segoe UI",system-ui,sans-serif;font-size:.8rem;font-weight:650;
+  padding:1px 7px;border:1px solid var(--keyline);border-bottom-width:2px;border-radius:5px;
+  background:var(--key);color:var(--keyink);white-space:nowrap;line-height:1.5}
+button{font:inherit;font-weight:600;font-size:.88rem;padding:9px 15px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);transition:border-color .15s,background .15s}
+button:hover{border-color:var(--red)}
+button.primary{background:var(--red);border-color:var(--red);color:#fff}
+button.primary:hover{filter:brightness(1.08)}
+button:disabled{opacity:.45;cursor:default} button:disabled:hover{border-color:var(--line)}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+select{font:inherit;font-size:.86rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink)}
+
+/* layout check */
+#layoutCheck .box{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--soft);
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.verdict{padding:12px 14px;border-radius:9px;margin-top:12px;font-size:.9rem;display:none}
+.verdict.ok{display:block;background:var(--goodbg);border:1px solid var(--good)}
+.verdict.no{display:block;background:var(--warnbg);border:1px solid var(--warn)}
+.probe{font:inherit;font-size:1.5rem;text-align:center;width:90px;padding:8px;border-radius:9px;
+  border:2px solid var(--keyline);background:var(--panel);color:var(--ink)}
+
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.lvl{text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:var(--soft);
+  cursor:pointer;display:block;width:100%;font-weight:500}
+.lvl:hover{border-color:var(--red)}
+.lvl.active{border-color:var(--red);background:rgba(193,20,48,.10)}
+.lvl .lt{font-weight:650;font-size:.94rem;display:flex;align-items:center;gap:7px}
+.lvl .ld{font-size:.79rem;opacity:.72;margin-top:4px;line-height:1.4;font-weight:400}
+.star{color:var(--good);font-weight:700;margin-left:auto;font-size:.78rem;white-space:nowrap}
+
+/* drill surface */
+.prompt{font-size:.82rem;color:var(--muted);margin-bottom:8px;min-height:1.2em}
+.target{font-family:"Cascadia Mono","Consolas","SF Mono",ui-monospace,monospace;
+  font-size:1.6rem;line-height:1.75;word-break:break-word;padding:16px;border-radius:10px;
+  background:var(--soft);border:1px solid var(--line);min-height:78px}
+.target .ch{border-radius:3px;padding:1px 0}
+.target .ch.done{color:var(--good);background:var(--goodbg)}
+.target .ch.err{color:var(--bad);background:var(--badbg);text-decoration:underline wavy}
+.target .ch.cur{background:var(--red);color:#fff}
+.target .ch.want{opacity:.55;font-size:.68em;vertical-align:super;color:var(--muted);
+  background:none;text-decoration:none;margin-left:1px;padding:0}
+@keyframes caretblink{0%,100%{opacity:1}50%{opacity:.3}}
+.tgt-wrap:focus-within .target .ch.cur{animation:caretblink 1.06s step-end infinite}
+.typing-hint{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  pointer-events:none;font-size:.9rem;font-weight:650;color:var(--muted);
+  background:rgba(128,128,128,.10);border-radius:10px}
+.tgt-wrap.armed:not(:focus-within) .typing-hint{display:flex}
+.tgt-wrap{position:relative}
+.tgt-wrap > input{
+  position:absolute; inset:0; width:100%; height:100%; margin:0; padding:16px;
+  border:1px solid transparent; border-radius:10px; background:transparent;
+  color:transparent; caret-color:transparent; font-size:16px; outline:none;
+  -webkit-text-fill-color:transparent;
+}
+.tgt-wrap > input:focus{ outline:none }
+.tgt-wrap:focus-within .target{ border-color:rgba(193,20,48,.55) }
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font-size:.84rem}
+.stat b{display:block;font-size:1.25rem;font-weight:700;line-height:1.2}
+.bar{height:6px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:12px;border:1px solid var(--line)}
+.bar > i{display:block;height:100%;background:var(--red);width:0;transition:width .18s}
+
+/* sprint */
+.sprintbar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.clock{font-size:2.5rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.clock.low{color:var(--bad)}
+.score{font-size:1.9rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--red)}
+.combo{font-size:.95rem;font-weight:700;color:var(--gold);min-width:104px}
+.combo.hidden{visibility:hidden}
+.pop{position:relative}
+.float{position:absolute;right:0;top:-4px;font-weight:800;color:var(--good);font-size:.95rem;
+  opacity:0;transform:translateY(0);pointer-events:none}
+.float.go{animation:fl .75s ease-out}
+@keyframes fl{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-24px)}}
+.result{text-align:center;padding:12px 0}
+.result .big{font-size:3rem;font-weight:800;line-height:1.1;color:var(--red)}
+.result .sub{font-size:1rem;color:var(--muted)}
+.pbtag{display:inline-block;background:var(--goodbg);border:1px solid var(--good);border-radius:99px;
+  padding:3px 12px;font-size:.8rem;font-weight:700;margin-top:8px}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:9px;margin-top:6px}
+.badge{border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--soft);opacity:.42}
+.badge.got{opacity:1;border-color:var(--gold);background:rgba(168,121,26,.10)}
+.badge .bn{font-weight:700;font-size:.88rem}
+.badge .bd{font-size:.76rem;opacity:.75;line-height:1.35;margin-top:2px}
+
+/* how-to + keyboard */
+.howto{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:.85rem;min-height:30px}
+.step{display:inline-flex;align-items:center;gap:5px}
+.plus{opacity:.5;font-weight:700}
+.then{opacity:.55;font-size:.78rem;font-style:italic;margin:0 2px}
+.kbwrap{margin-top:16px;overflow-x:auto;padding-bottom:4px}
+.kb{display:inline-block;min-width:660px;width:100%}
+.krow{display:flex;gap:5px;margin-bottom:5px}
+.k{position:relative;flex:1 1 0;min-width:0;height:48px;border:1px solid var(--keyline);border-bottom-width:2px;
+  border-radius:7px;background:var(--key);color:var(--keyink);display:flex;align-items:center;justify-content:center;
+  font-size:1rem;font-weight:600;user-select:none}
+.k .us{position:absolute;top:2px;left:5px;font-size:.58rem;font-weight:600;opacity:.42}
+.k .sh{position:absolute;top:2px;right:5px;font-size:.62rem;font-weight:700;opacity:.55}
+.k .ag{position:absolute;bottom:2px;right:5px;font-size:.62rem;font-weight:700;
+  color:var(--rj);opacity:.9}
+.k.hot .ag{color:#fff;opacity:.95}
+.k .main{margin-top:6px}
+.k.wide{flex:1.6 1 0} .k.wider{flex:2.1 1 0} .k.space{flex:7 1 0}
+.k.mod{font-size:.68rem;font-weight:650;opacity:.72}
+.k.hot{background:var(--red);border-color:var(--red);color:#fff}
+.k.hot .us,.k.hot .sh{opacity:.85;color:#fff}
+.k.hot2{background:rgba(193,20,48,.18);border-color:var(--red)}
+.k.dead{outline:2px dashed var(--warn);outline-offset:-3px}
+.k.next{outline:2px solid rgba(193,20,48,.42);outline-offset:-2px}
+.step.dim{opacity:.48}
+.legend{font-size:.76rem;color:var(--muted);margin-top:10px;display:flex;gap:16px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.swatch{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid var(--keyline)}
+
+/* tables */
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid var(--line);font-size:.78rem;margin:2px 3px 2px 0}
+.chip.weak{border-color:var(--bad);color:var(--bad)}
+textarea{width:100%;font:inherit;font-size:.88rem;padding:10px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);min-height:110px;resize:vertical}
+.code{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-size:.95rem;letter-spacing:.03em;
+  padding:9px 12px;border:1px dashed var(--line);border-radius:8px;display:block;background:var(--soft);
+  word-break:break-all;margin:8px 0}
+details{border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:10px 0;background:var(--soft)}
+summary{cursor:pointer;font-weight:650;font-size:.9rem}
+details[open] summary{margin-bottom:8px}
+details.install{border-color:rgba(193,20,48,.45);background:rgba(193,20,48,.05)}
+details.install > summary{color:var(--red);font-weight:700}
+.steps{counter-reset:s;list-style:none;margin:10px 0 0;padding:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 34px;font-size:.89rem;line-height:1.5}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:23px;height:23px;
+  border-radius:50%;background:var(--red);color:#fff;font-size:.75rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.steps li:last-child{padding-bottom:2px}
+.path{font-weight:650}
+.path .arrow{color:var(--red);margin:0 5px;font-weight:700}
+.figcap{font-size:.76rem;color:var(--muted);margin-top:5px;text-align:center}
+.fig{margin:14px 0 4px;text-align:center}
+.fig svg{max-width:100%;height:auto}
+.whybox{border-left:3px solid var(--red);padding:2px 0 2px 13px;margin:12px 0 0}
+.whybox p{font-size:.86rem;margin:0 0 7px}
+.whybox p:last-child{margin-bottom:0}
+details.install details{border-color:rgba(128,128,128,.34);background:rgba(128,128,128,.06);margin:14px 0 0}
+details.install details > summary{color:inherit;font-weight:650}
+.yesno{font-size:.86rem;margin:8px 0 2px}
+.yesno b{color:var(--red)}
+.gives{margin:8px 0 0;padding-left:18px;font-size:.86rem;line-height:1.5}
+.gives li{margin-bottom:6px}
+.warnbox{background:var(--warnbg);border:1px solid var(--warn);border-radius:8px;
+  padding:10px 12px;margin:12px 0 0;font-size:.85rem;line-height:1.5}
+.undo{font-size:.85rem;margin-top:12px;line-height:1.5}
+.keynote{color:var(--muted);font-size:.93em}
+.panel a{color:var(--red);font-weight:600;text-decoration-thickness:1px;text-underline-offset:2px}
+.panel a:hover{text-decoration:none}
+.big-screen table{font-size:1.25rem}
+.big-screen th{font-size:.9rem}
+.rank1{color:var(--gold);font-weight:800}
+footer{border-top:1px solid var(--line);margin-top:34px;padding:18px 0 8px;font-size:.8rem;color:var(--muted);text-align:center}
+footer a{color:inherit}
+@media (max-width:640px){ .target{font-size:1.25rem} .site-header h1{font-size:1.1rem} .clock{font-size:2rem} }
+@media print{ body{background:#fff} .noprint{display:none!important} .panel{border:none;padding:0} .tabs{display:none} .view{display:block!important} }
+
+/* Layout switcher. The one control that changes what every keycap means. */
+.layoutbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;
+  padding:11px 14px;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+.lb-label{font-size:.74rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--rj);white-space:nowrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.segbtn{font:inherit;font-size:.88rem;padding:7px 15px;border:0;background:transparent;
+  color:inherit;cursor:pointer;white-space:nowrap}
+.segbtn+.segbtn{border-left:1px solid var(--line)}
+.segbtn:hover{background:rgba(128,128,128,.12)}
+.segbtn.on{background:var(--rj);color:#fff;font-weight:650}
+.segbtn.on:hover{background:var(--rj)}
+.lb-note{font-size:.8rem;opacity:.7;line-height:1.35}
+@media (max-width:560px){ .layoutbar{gap:8px} .lb-note{flex-basis:100%} }
+</style>
+</head>
+<body>
+<div class="ctr">
+
+  <header class="site-header">
+    <img class="rj-mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAABQCAYAAACu/a1QAAAKKElEQVR4nO2cWWxcVx3Gf9+513ZiJ21ju7S0LxAKgkSN3QXK0hIHRCshqvahtlTEIkqliPIAqhAPLHIskBAgeOOl9AUkNlssLyxKqsROQ9VCI7JAkEqJgtSmbRJnT7zM3PPxcGcS2xlPxvb1IiWfdDQz955zz/nO8l/O+d/RcEf3HuNWicjywjYtwfpTU+uqgQ+/9uKY6U3EULZYFYbFevA8IIkJBz9SGhv/2XD7Xe8TQ5khGLQYFa4k8gACn7W8UfIvhju6Py2IAg9CUnRlK408oAR03tjC20Y6un+068aum/ogG6S30A5YgeQBnCBilE9F/LBS/Xpn+6b7+gpe/yuUPAASSiROSr4thPDsSEfX1lfuuKOlKBmwkslXkUYYN3HM0reOnl7z8VwGLHwJpOBMcgYzVZ2u9nCDC1GPRlKdgRAEoXKEC4ndXESdAKnROplWTSHvXOefr9te04zUUkQjAsQI5+t1gLEwwchF1AmQytoWQ2wKyMIysqNvCQpfsK4cWeMIWgPsCJE/RocQFOc3A2whOQbfF6zPRvm00JItxbTn5D9+N/PiC+1dt5fgiVnKWKZZgf9sPr5/e0Ht2D7c0TWB9aTF6XozoEikUwXHKQ6HdayPZf51I9RdWnZ0S6VsAsxbBfUCQ0DP6NAPhju7V4EfNz63FDMgnao7+8Fb2Rv36M7sqmyE+xjKBullofp3kN7EoN0OeyLZZyQKW9f1sGJUncBR5VYVKNCuhhVDHkCEJfUsVxT5pcaKIb9Ybms9rAjyN3NMAgMWXrJOSOdd0qiq6gbpnfdjTnE4bGGkNNJ5z9sj5S8BYyyRoTNf8nLQREXFLdTNzPZ03HVb5vJPJdZbnFsyI2euBYSC4aIi94/c3L3WdpAUnXsnl9RU9bc9fS1X89j58Fq4HP0RiXcCZ1S3TXKhtv08ykhiQmYD0XcLcibAVNOk+vuKBezL9135bRhz7tjUIx6BJhfp1c2znCwmwGNFNKJiytbz6DLBWqQjq1K/nPfp0IJtgvkLPFADPv+CUSHeJsKxJGRPfuitg0cMVe2wIKwIVTc7LhMPIXvygWMHDw9CUgRxWELyAldTg/kjVxDvTfoWrl0uYSHTvi5sNFXYTZV9BoKIdaw622qydMyJn9j81sEjOfFid28XZORUjRGBY37BVFRZ9fhLlY2+3FtzdeRTm0Ad19U4yJo8G9Jj/RB6CxBwMzFn8s5PUNqQ/haI3yvZSpTEJqXRmnSqEMeBdDKNAONAM+OOCm4huBTSGGK2LopnZLcishozQMjjmDvWlrJHBuBXG+lNWO6RV77XFwznPnriwCvzrPeNkY6uEaPHIJ6upTUCkqVxmUcMvylCtc3EvKe9cdKfC8zAFdveV2JbRdANsznpYSTbrfhbSB4Rqmmy5QeU8SLSpl3tm97/sZMHXip63c+bvJAHIPYDAw2QH7j0baRs0M4TB/d9rKPrgKVNwhddQ/MoP7ZOQtBjwEu9bCh0lycYVE0bK5+NupVTy1RTI+WG6A0DEC3+gN0S8SyklCg3eze/0N51Owy40kkqIoWp+rcPMoEVYrkR7tPKzEGHVyW3S2wHXpdDM7OUtVy2WVcSj+bPtyt5F5z0YvsHbqhWNJZNhNVJSyyFsXdHJ886P8aaAWXCNxiGm1etfvpc6WJY29R6adp/6LUXxxvphOr6He7s+qbM5y2fmsVczk+H4KjLPL72THrhMGNaz+oFLwENd3bvmnYBbDtBtM1ayggxiXWW3Pl2xAnSxESITzz01oFjV7O/DUEQd7d3b8jkX0tMMMuyUd4BiaXjmMnZ8s0VqcxNNauj1qhful0ZDd9qV71SEvB4zCYbcnZEbuHp5L5DIx3dL4M/ONt5nUGIzPatFLjXl1qebX3XryS3ziYrmWyTCCZXKTQ8HYfoDTCUGf3e9v2S68lMSUw2+uxGUE9yNoJpZTTHUakKvok02ynxP6wW6suLQqR8NS2rS1sNMnjorQMXsP8CtLmgM/9GsOz+/L8YMkAWmv4gdE5LsEFSxbKTr1iJ4ePH9/4X+UWgra6wLRAhr2ihiWpoy7wavZFeAYSo38kkzsVpY6kxuLI5YuVeaRTEVNa6+TR4OmQgsTReitmcZ1NfLvh0S/v554+ebjsk6x1IEw2a2Vc1q2VarNyanZo3FXx9ZuZY6dFQ2WyIRkF46vXqtbyEK7vXytasXncKKoZJ4zDAe159dWLH2vd+sbVt9ZryxGSE1bMWiLGUhFDOYki/GqRPmni2poVoFJV8Q5Rfz3CIU9pVmMGwXNjV0bVN6HFUe18Ao0nCww+O/uPozFtp0SGdC/W3DdrWwKDcxj3JUfZmxomull1uM4RhCD1T3O+06E3BhUKXva66GGS9trI3DjdwfJUoiarsPWyZQn7ZVd1y4jr5axXXyV+ruE7+WsV18tcqrpO/VnGd/LWKa5p8oTE5Bg2zOTnO2zwzGneIPMC4h5GoBo60lwKFks998ZFGTnhXBAohb/qDGIjPd959TznGBxW4aDxtSQlFR1pJ+fuWY/ue66c/DDCwrDOgoJE/JIBIuVvS08AJefqzJZcRHbKeAZ7bWCmznCg2Ds8aR5wwPoWmv+8uyCRZ5qJBQwVU159Hlsz77YRCpb3yw4YUSISmJUOCacrkksDrObygum/mmAYgyvVfAKyHJQw/lSxNyN60p+PDa+9lb6n6Pt1c0y42p1sYKe/q6HpU4iHkc7NEddTFkpHPQ8t8EXR3pou/2N3evaGPoWnxPI2mLYyUd9/c/ZjE9+Klx88dixZ7WwuVCJbzxusd9PPdHV3fzcoMp0SNh+arSv5VcTKsDs3xQih/KtrfBs5X3tyoE9Ewu01ROHmjWH8glIAuYJotf0cpo1GJm2uccVZZVT9jknCBDJtO8lfc6xIHZ4a2xLXPDwsmb0msieikLkd91MqXIMpACXRjrSi8akHP+KzcHK90Sj1BX8bqQPw1deubtQKkClrzQ9GglsmWPwG/TEwHrh5/zwoZAnK5VvIs18ljiOqezBpnNm+z2H62KX3q/tEXzl26NbUBCyd+JYY7u/oEX4uwRnCWpZMtzkPpWAc82zO6//uQ2wMDNfyJQsn7cmBS3NG56T3N1oDhXolTlfuLqV2q639NUPhJqRx3JknSnpRK/3zgzMFTizjtc1RUURykN/nEiQOvtI2mnxM8E2GNTYsXKdzEECuhcK1B+lbZ8XAa6ImUb8uaQu8LN2xov9zEy1iUkehjKOuHcC97S5tH9/8wNU8hncRaV3S8TeXlhxZBYvPl1nKyI1FYFUVzINwq4svl5uY7Z0ZlwCJOw8oa0yC9yQOj+4dDSh/wZ6Ebrla2UQhigFUyZ0BP9ozu33UuHVsNcW0aOSL53ya5tUyo+c8vi23hVf9aIvnom/uObxnd/xXBj+cQSFT32babDMftsLVndN/fX+aepi3HD70JfsMJNzmqM+Dbt5x4177Kmp8m9P4PGALmSB+aZc8AAAAASUVORK5CYII=" alt="Regis Jesuit">
+    <div class="hdr-txt">
+      <h1>Raider Clavier</h1>
+      <div class="sub" id="subLine">Type French on a US keyboard</div>
+    </div>
+    <label class="who noprint">Name
+      <input id="student" type="text" placeholder="Your name" autocomplete="name" spellcheck="false">
+    </label>
+  </header>
+
+  <div class="layoutbar noprint">
+    <span class="lb-label">Your keyboard layout</span>
+    <div class="seg" role="group" aria-label="Keyboard layout">
+      <button class="segbtn" type="button" data-lay="intl">US-International</button>
+      <button class="segbtn" type="button" data-lay="fr">French AZERTY</button>
+    </div>
+    <span class="lb-note" id="layNote"></span>
+  </div>
+
+  <div class="tabs noprint" role="tablist">
+    <button class="tab" id="t-practice"  role="tab" aria-selected="true"  data-v="practice">Practice</button>
+    <button class="tab" id="t-sprint"    role="tab" aria-selected="false" data-v="sprint">Sprint</button>
+    <button class="tab" id="t-progress"  role="tab" aria-selected="false" data-v="progress">My progress</button>
+    <button class="tab" id="t-board"     role="tab" aria-selected="false" data-v="board">Class leaderboard</button>
+    <button class="tab" id="t-cheat"     role="tab" aria-selected="false" data-v="cheat">Shortcut sheet</button>
+  </div>
+
+  <!-- =================== PRACTICE =================== -->
+  <div class="view on" id="v-practice">
+
+    <section class="panel noprint" id="layoutCheck">
+      <h3>First &middot; check your keyboard</h3>
+      <p class="small" id="checkIntro"></p>
+      <div class="box">
+        <div class="small" id="checkAsk"></div>
+        <input class="probe" id="probe" maxlength="1" spellcheck="false" autocomplete="off" aria-label="Keyboard layout test">
+        <button id="probeAgain" type="button">Clear</button>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <div id="installHost1"></div>
+    </section>
+
+    <section class="panel noprint">
+      <h3>Choose a drill</h3>
+      <div class="levels" id="levels"></div>
+      <details>
+        <summary>Teacher: load your own word or sentence list</summary>
+        <p class="tiny muted">One word or sentence per line. Nothing is uploaded &mdash; the list is carried
+        inside the link you hand out, so students never have to type it in themselves.
+        It becomes a drill called &ldquo;Class list,&rdquo; usable in Sprint too.</p>
+        <textarea id="customIn" placeholder="la canción&#10;el pingüino&#10;¿Cómo se llama tu compañero?&#10;Mañana es el cumpleaños de mi mamá."></textarea>
+        <div class="row" style="margin-top:9px">
+          <button id="saveCustom" class="primary" type="button">Save class list</button>
+          <button id="shareCustom" type="button">Copy student link</button>
+          <button id="clearCustom" type="button">Remove</button>
+          <span class="tiny muted" id="customNote"></span>
+        </div>
+        <div class="code" id="shareLink" style="display:none"></div>
+        <p class="tiny muted" id="shareHelp" style="display:none">Post this link in Canvas or Teams.
+          Opening it loads your list straight into the student&rsquo;s copy &mdash; no typing, no accounts.</p>
+      </details>
+    </section>
+
+    <section class="panel" id="drillPanel">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div>
+          <h2 id="drillTitle">Pick a drill to begin</h2>
+          <div class="prompt" id="drillPrompt">Everything runs in this browser. Nothing you type is sent anywhere.</div>
+        </div>
+        <div class="row noprint">
+          <button id="restartBtn" type="button">Restart</button>
+          <button id="skipBtn" type="button">Skip line</button>
+        </div>
+      </div>
+
+      <div class="tgt-wrap">
+        <div class="target" id="target" aria-hidden="true">
+          <span class="muted" style="font-size:1rem">Choose a drill above, then start typing.</span>
+        </div>
+        <div class="typing-hint">Click here, then type</div>
+        <input id="capture" autocomplete="off" autocorrect="off" autocapitalize="off"
+               spellcheck="false" aria-label="Type the line shown above">
+      </div>
+      <div class="bar"><i id="bar"></i></div>
+
+      <div class="stats">
+        <div class="stat"><b id="sWpm">&mdash;</b><span class="muted">words / min</span></div>
+        <div class="stat"><b id="sCpm">&mdash;</b><span class="muted">letters / min</span></div>
+        <div class="stat"><b id="sAcc">&mdash;</b><span class="muted">accuracy</span></div>
+        <div class="stat"><b id="sLine">0 / 0</b><span class="muted">lines</span></div>
+        <div class="stat"><b id="sErr">0</b><span class="muted">mistakes</span></div>
+      </div>
+
+      <div class="howto" id="howto"></div>
+
+      <div class="kbwrap noprint"><div class="kb" id="kb"></div></div>
+      <div class="legend noprint">
+        <span><i class="swatch" style="background:var(--red);border-color:var(--red)"></i> press this now</span>
+        <span><i class="swatch" style="background:rgba(193,20,48,.18);border-color:var(--red)"></i> hold this</span>
+        <span><i class="swatch" style="outline:2px dashed var(--warn);outline-offset:-3px"></i> accent key &mdash; nothing appears until the next key</span>
+        <span>small grey letter = what is printed on your keycap</span>
+        <span>small <strong style="color:var(--rj)">red</strong> letter in the corner = hold <kbd>Alt Gr</kbd> for it</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- =================== SPRINT =================== -->
+  <div class="view" id="v-sprint">
+    <section class="panel">
+      <h3>Sprint &middot; beat your own best</h3>
+      <div class="row" style="margin-bottom:14px">
+        <label class="small muted">Length
+          <select id="sprintLen">
+            <option value="30">30 seconds</option>
+            <option value="60" selected>60 seconds</option>
+            <option value="120">2 minutes</option>
+          </select>
+        </label>
+        <label class="small muted">Words from
+          <select id="sprintPool">
+            <option value="mix">Everything</option>
+            <option value="acute">é words only</option>
+            <option value="grave">è à ç words</option>
+            <option value="hat">Circumflex and tréma words</option>
+            <option value="sent">Full sentences</option>
+            <option value="custom">Class list</option>
+          </select>
+        </label>
+        <button id="sprintGo" class="primary" type="button">Start sprint</button>
+      </div>
+
+      <div class="sprintbar">
+        <div><div class="clock" id="clock">60</div><span class="muted tiny">seconds left</span></div>
+        <div class="pop"><div class="score" id="score">0</div><span class="muted tiny">points</span>
+          <span class="float" id="float"></span></div>
+        <div class="combo hidden" id="combo">&times;1.0 &nbsp;streak 0</div>
+      </div>
+
+      <div class="tgt-wrap">
+        <div class="target" id="sTarget" aria-hidden="true">
+          <span class="muted" style="font-size:1rem">Press <strong>Start sprint</strong>. The clock begins on your first keystroke.</span>
+        </div>
+        <div class="typing-hint">Click here, then type</div>
+        <input id="sCapture" autocomplete="off" autocorrect="off" autocapitalize="off"
+               spellcheck="false" aria-label="Type the line shown above">
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="spWpm">&mdash;</b><span class="muted">words / min</span></div>
+        <div class="stat"><b id="spCpm">&mdash;</b><span class="muted">letters / min</span></div>
+        <div class="stat"><b id="spAcc">&mdash;</b><span class="muted">accuracy</span></div>
+        <div class="stat"><b id="spAcc2">&mdash;</b><span class="muted">accented chars typed</span></div>
+      </div>
+
+      <div id="sprintResult"></div>
+      <p class="tiny muted" style="margin-top:14px">Points reward the characters this class is actually about:
+      an ordinary letter is 10, an accented letter — <strong>é è à ç ê ë ô û</strong> — is 25.
+      A clean streak raises the multiplier; a mistake resets it.</p>
+    </section>
+
+    <section class="panel">
+      <h3>Badges</h3>
+      <div class="badges" id="badges"></div>
+    </section>
+  </div>
+
+  <!-- =================== PROGRESS =================== -->
+  <div class="view" id="v-progress">
+    <section class="panel">
+      <h3>My progress</h3>
+      <div id="progressBody"></div>
+      <div class="row noprint" style="margin-top:16px">
+        <button id="btnReport" class="primary" type="button">Download report for my teacher</button>
+        <button id="btnPrint" type="button">Print / Save as PDF</button>
+        <button id="btnCopy" type="button">Copy summary text</button>
+        <button id="btnReset" type="button">Erase my progress</button>
+      </div>
+      <p class="tiny muted" style="margin-top:10px">The report is one file you can attach to a Canvas assignment.
+      It carries a check code your teacher can paste into the Class leaderboard tab to confirm nothing was edited by hand.</p>
+    </section>
+
+    <section class="panel noprint">
+      <h3>My score code</h3>
+      <p class="small">For a leaderboard, send your teacher this one line &mdash; in Canvas, Teams chat, or on paper.
+      It contains your name and your numbers, nothing else.</p>
+      <div class="code" id="myCode">Type your name above and finish a sprint first.</div>
+      <div class="row">
+        <button id="btnCode" class="primary" type="button">Copy my score code</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- =================== LEADERBOARD =================== -->
+  <div class="view" id="v-board">
+    <section class="panel">
+      <h3>Class leaderboard &middot; for the teacher</h3>
+      <p class="small">There is no server and no sign-in, so scores do not gather themselves.
+      Have students paste their <strong>score code</strong> into a Canvas assignment or a Teams message,
+      then paste the whole pile in here. One code per line; extra text around them is ignored.</p>
+      <textarea id="boardIn" style="min-height:130px" placeholder="RC1~Chloé Martin~0922~42~214~97~1580~K3D9F2&#10;RC1~Luc Bernard~0922~38~191~99~1490~P8X1B7"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="boardGo" class="primary" type="button">Build leaderboard</button>
+        <label class="small muted">Rank by
+          <select id="boardSort">
+            <option value="points">Points</option>
+            <option value="wpm">Words per minute</option>
+            <option value="cpm">Letters per minute</option>
+            <option value="acc">Accuracy</option>
+          </select>
+        </label>
+        <button id="boardBig" type="button">Big screen</button>
+        <button id="boardCsv" type="button">Download CSV</button>
+      </div>
+      <div id="boardOut" style="margin-top:16px"></div>
+      <p class="tiny muted" id="boardNote" style="margin-top:10px"></p>
+    </section>
+
+    <section class="panel noprint">
+      <h3>A note on ranking a class</h3>
+      <p class="small">Typing speed is a motor skill with an objective number, which is the one place a board like this
+      is fairly safe &mdash; but a permanent public ranking is still the version of gamification with the weakest
+      evidence behind it. Two ways to use this that keep the fun without the floor falling out for the slowest typist:
+      run it as a <strong>single-round arcade score</strong> that resets each time, or rank by
+      <strong>gain over a student&rsquo;s own first score</strong> rather than raw speed. Every student&rsquo;s
+      personal best is already tracked privately on their own machine, with no ranking at all.</p>
+    </section>
+  </div>
+
+  <!-- =================== CHEAT SHEET =================== -->
+  <div class="view" id="v-cheat">
+    <section class="panel">
+      <h3 id="cheatHead">Shortcut sheet</h3>
+      <p class="small muted">Every French character, and how to reach it on the layout you picked above.
+      Switch layouts at the top of the page and this table changes with it.</p>
+      <table>
+        <thead><tr><th>You want</th><th>Press</th><th>Note</th></tr></thead>
+        <tbody id="cheat"></tbody>
+      </table>
+    </section>
+    <section class="panel">
+      <h3>Turning the layout on</h3>
+      <p class="small" id="turnOn"></p>
+      <p class="small"><strong>A dead key does nothing at first &mdash; that is correct.</strong>
+      It sends an accent and waits. The accented letter appears when you press the vowel.
+      To type the bare accent mark, press the dead key then <kbd>Space</kbd>.</p>
+      <p class="small"><strong>French spacing.</strong> French puts a space before
+      <kbd>?</kbd> <kbd>!</kbd> <kbd>:</kbd> <kbd>;</kbd> and inside <kbd>&laquo;&nbsp;&raquo;</kbd>
+      &mdash; <em>Comment ça va&nbsp;?</em> The sentence drills follow that convention, and Word does it
+      automatically once the document language is set to French.</p>
+      <div id="installHost2"></div>
+    </section>
+  </div>
+
+  <footer class="noprint">
+    Your work never leaves your browser &middot; Anonymous page counts only &middot;
+    <a href="https://github.com/RJEdTech/Raider-Clavier">View on GitHub</a> &middot;
+    <a href="https://forms.microsoft.com/r/sKU9sHY45r">Report a bug or request a tool</a>
+  </footer>
+</div>
+
+
+<script>
+/* ==========================================================================
+   Raider Teclado  ·  Regis Jesuit Educational Technology
+   Windows "Spanish (Latin America)" layout (kbdla) mapped onto US ANSI keys.
+   No network calls. localStorage only.
+   ========================================================================== */
+(function(){
+"use strict";
+
+/* ---------- 1. LAYOUTS ---------------------------------------------------
+   Two layouts, one engine. A key is
+     [event.code, printed US legend, base, shift, altgr, flags, deadStates]
+   deadStates names which of those outputs are DEAD keys: "b" base, "s" shift,
+   "a" altgr. A dead key prints nothing until the next key is pressed.
+   Mappings taken from the Windows layout drivers themselves (kbdfr.dll and
+   kbdusx.dll, via kbdlayout.info's KLC/XML exports), not from memory.       */
+
+var MODS = {
+  bksp:["Backspace","","\u2190 Bksp","","","wider mod"],
+  tab:["Tab","","Tab","","","wide mod"],
+  caps:["CapsLock","","Caps","","","wide mod"],
+  enter:["Enter","","Enter","","","wider mod"],
+  lsh:["ShiftLeft","","Shift","","","wider mod"],
+  rsh:["ShiftRight","","Shift","","","wider mod"],
+  row5:[
+    ["ControlLeft","","Ctrl","","","wide mod"],
+    ["MetaLeft","","Win","","","wide mod"],
+    ["AltLeft","","Alt","","","wide mod"],
+    ["Space","","space","","","space mod"],
+    ["AltRight","","Alt Gr","","","wide mod"],
+    ["ControlRight","","Ctrl","","","wide mod"]
+  ]
+};
+
+/* Composition tables. Shared shapes, but each layout reaches them differently. */
+function deadTable(pairs){
+  var o={}, i;
+  for(i=0;i<pairs.length;i+=2) o[pairs[i]]=pairs[i+1];
+  return o;
+}
+var T_CIRC  = deadTable(["a","\u00e2","e","\u00ea","i","\u00ee","o","\u00f4","u","\u00fb",
+                         "A","\u00c2","E","\u00ca","I","\u00ce","O","\u00d4","U","\u00db"]);
+var T_TREMA = deadTable(["a","\u00e4","e","\u00eb","i","\u00ef","o","\u00f6","u","\u00fc","y","\u00ff",
+                         "A","\u00c4","E","\u00cb","I","\u00cf","O","\u00d6","U","\u00dc"]);
+var T_GRAVE = deadTable(["a","\u00e0","e","\u00e8","i","\u00ec","o","\u00f2","u","\u00f9",
+                         "A","\u00c0","E","\u00c8","I","\u00cc","O","\u00d2","U","\u00d9"]);
+var T_ACUTE = deadTable(["a","\u00e1","e","\u00e9","i","\u00ed","o","\u00f3","u","\u00fa","y","\u00fd",
+                         "c","\u00e7",
+                         "A","\u00c1","E","\u00c9","I","\u00cd","O","\u00d3","U","\u00da","C","\u00c7"]);
+var T_TILDE = deadTable(["a","\u00e3","n","\u00f1","o","\u00f5","A","\u00c3","N","\u00d1","O","\u00d5"]);
+
+var LAYOUTS = {
+
+/* ===== United States-International =======================================
+   US keycaps tell the truth. Accents come from dead keys on ' ` ^ ~ and " . */
+intl: {
+  id:"intl",
+  name:"US-International",
+  full:"United States-International",
+  winPick:"United States-International",
+  indicator:"ENG",
+  blurb:"Your keys still say what they do. The apostrophe and quote keys become accent keys.",
+  ROWS: [
+    [
+      ["Backquote","`","`","~","","","bs"],
+      ["Digit1","1","1","!","\u00a1"], ["Digit2","2","2","@","\u00b2"],
+      ["Digit3","3","3","#","\u00b3"], ["Digit4","4","4","$","\u00a4"],
+      ["Digit5","5","5","%","\u20ac"], ["Digit6","6","6","^","\u00bc","","s"],
+      ["Digit7","7","7","&","\u00bd"], ["Digit8","8","8","*","\u00be"],
+      ["Digit9","9","9","(","\u2018"], ["Digit0","0","0",")","\u2019"],
+      ["Minus","-","-","_","\u00a5"], ["Equal","=","=","+","\u00d7"],
+      MODS.bksp
+    ],
+    [
+      MODS.tab,
+      ["KeyQ","Q","q","Q","\u00e4"], ["KeyW","W","w","W","\u00e5"],
+      ["KeyE","E","e","E","\u00e9"], ["KeyR","R","r","R"],
+      ["KeyT","T","t","T","\u00fe"], ["KeyY","Y","y","Y","\u00fc"],
+      ["KeyU","U","u","U","\u00fa"], ["KeyI","I","i","I","\u00ed"],
+      ["KeyO","O","o","O","\u00f3"], ["KeyP","P","p","P","\u00f6"],
+      ["BracketLeft","[","[","{","\u00ab"],
+      ["BracketRight","]","]","}","\u00bb"],
+      ["Backslash","\\","\\","|","\u00ac"]
+    ],
+    [
+      MODS.caps,
+      ["KeyA","A","a","A","\u00e1"], ["KeyS","S","s","S","\u00df"],
+      ["KeyD","D","d","D","\u00f0"], ["KeyF","F","f","F"],
+      ["KeyG","G","g","G"], ["KeyH","H","h","H"],
+      ["KeyJ","J","j","J"], ["KeyK","K","k","K"],
+      ["KeyL","L","l","L","\u00f8"],
+      ["Semicolon",";",";",":"],
+      ["Quote","'","'","\"","\u00b4","","bs"],
+      MODS.enter
+    ],
+    [
+      MODS.lsh,
+      ["KeyZ","Z","z","Z","\u00e6"], ["KeyX","X","x","X"],
+      ["KeyC","C","c","C","\u00a9"], ["KeyV","V","v","V"],
+      ["KeyB","B","b","B"], ["KeyN","N","n","N","\u00f1"],
+      ["KeyM","M","m","M"],
+      ["Comma",",",",","<","\u00e7"],
+      ["Period",".",".",">"],
+      ["Slash","/","/","?"],
+      MODS.rsh
+    ],
+    MODS.row5
+  ],
+  /* Dead-key routes come first here: ' + e is the layout's whole idea, and it
+     generalises to every vowel and to c. The AltGr chords are the shortcut,
+     and they live on the cheat sheet. */
+  deadFirst: true,
+  DEAD: { "'":T_ACUTE, "\"":T_TREMA, "`":T_GRAVE, "^":T_CIRC, "~":T_TILDE },
+  DEADNAME: { "'":"acute", "\"":"tr\u00e9ma", "`":"grave", "^":"circumflex", "~":"tilde" },
+  /* Second routes worth knowing but not worth teaching first. */
+  ALT: { "\u00e9":"Alt Gr + e", "\u00c9":"Shift + Alt Gr + e",
+         "\u00e7":"Alt Gr + ,", "\u00c7":"Shift + Alt Gr + ,",
+         "\u00fc":"Alt Gr + y", "\u20ac":"Alt Gr + 5" },
+  probe: {
+    ask:"press the apostrophe key <kbd>'</kbd>, then <kbd>e</kbd>",
+    want:"\u00e9",
+    wrong:"'",
+    wrongMsg:"That gave a plain apostrophe, so you are still on ordinary US English. " +
+             "US-International turns <kbd>'</kbd> into an accent key.",
+    okMsg:"<strong>US-International is on.</strong> The apostrophe became an accent. Pick a drill below."
+  },
+  addName:"United States-International",
+  addNote:"It appears in the keyboard list under <strong>English (United States)</strong>, " +
+          "spelled <strong>United States-International</strong>."
+},
+
+/* ===== French (France), AZERTY ===========================================
+   The letters themselves move. é è ç à ù get their own keys; the circumflex
+   and tréma share one dead key beside P. There is no acute dead key at all. */
+fr: {
+  id:"fr",
+  name:"French AZERTY",
+  full:"French (France) \u2014 AZERTY",
+  winPick:"French (France)",
+  indicator:"FRA",
+  blurb:"The letters move. A\u2194Q, Z\u2194W, M jumps beside L, and the digits need Shift.",
+  ROWS: [
+    [
+      ["Backquote","`","\u00b2",""],
+      ["Digit1","1","&","1"], ["Digit2","2","\u00e9","2","~","","a"],
+      ["Digit3","3","\"","3","#"], ["Digit4","4","'","4","{"],
+      ["Digit5","5","(","5","["], ["Digit6","6","-","6","|"],
+      ["Digit7","7","\u00e8","7","`","","a"], ["Digit8","8","_","8","\\"],
+      ["Digit9","9","\u00e7","9","^"], ["Digit0","0","\u00e0","0","@"],
+      ["Minus","-",")","\u00b0","]"], ["Equal","=","=","+","}"],
+      MODS.bksp
+    ],
+    [
+      MODS.tab,
+      ["KeyQ","Q","a","A"], ["KeyW","W","z","Z"],
+      ["KeyE","E","e","E","\u20ac"], ["KeyR","R","r","R"],
+      ["KeyT","T","t","T"], ["KeyY","Y","y","Y"],
+      ["KeyU","U","u","U"], ["KeyI","I","i","I"],
+      ["KeyO","O","o","O"], ["KeyP","P","p","P"],
+      ["BracketLeft","[","^","\u00a8","","","bs"],
+      ["BracketRight","]","$","\u00a3","\u00a4"],
+      ["Backslash","\\","*","\u00b5"]
+    ],
+    [
+      MODS.caps,
+      ["KeyA","A","q","Q"], ["KeyS","S","s","S"],
+      ["KeyD","D","d","D"], ["KeyF","F","f","F"],
+      ["KeyG","G","g","G"], ["KeyH","H","h","H"],
+      ["KeyJ","J","j","J"], ["KeyK","K","k","K"],
+      ["KeyL","L","l","L"],
+      ["Semicolon",";","m","M"],
+      ["Quote","'","\u00f9","%"],
+      MODS.enter
+    ],
+    [
+      MODS.lsh,
+      ["KeyZ","Z","w","W"], ["KeyX","X","x","X"],
+      ["KeyC","C","c","C"], ["KeyV","V","v","V"],
+      ["KeyB","B","b","B"], ["KeyN","N","n","N"],
+      ["KeyM","M",",","?"],
+      ["Comma",",",";","."],
+      ["Period",".",":","/"],
+      ["Slash","/","!","\u00a7"],
+      MODS.rsh
+    ],
+    MODS.row5
+  ],
+  deadFirst: false,
+  DEAD: { "^":T_CIRC, "\u00a8":T_TREMA, "`":T_GRAVE, "~":T_TILDE },
+  DEADNAME: { "^":"circumflex", "\u00a8":"tr\u00e9ma", "`":"grave", "~":"tilde" },
+  ALT: { "\u20ac":"Alt Gr + e", "@":"Alt Gr + 0" },
+  /* The honest gaps. kbdfr has no acute dead key and no cedilla dead key, and
+     Caps Lock does not accent (that is Mac behaviour), so these cannot be
+     typed on this layout at all. The tool says so rather than pretending. */
+  MISSING: {
+    "\u00c9":"There is no acute accent key on AZERTY, and Caps Lock does not add one.",
+    "\u00c7":"There is no cedilla accent key on AZERTY.",
+    "\u0153":"The oe ligature is not on this layout.",
+    "\u0152":"The oe ligature is not on this layout.",
+    "\u00ab":"Guillemets are not on this layout.",
+    "\u00bb":"Guillemets are not on this layout."
+  },
+  probe: {
+    ask:"press the key just right of <kbd>L</kbd>",
+    want:"m",
+    wrong:";",
+    wrongMsg:"That gave <kbd>;</kbd>, which is the English layout. On AZERTY that key is <strong>m</strong>.",
+    okMsg:"<strong>French AZERTY is on.</strong> That key gives m. Pick a drill below."
+  },
+  addName:"French (France)",
+  addNote:"Pick <strong>French (France)</strong>. The variant marked " +
+          "<em>Standard (AZERTY)</em> or <em>Legacy</em> is the one these drills match."
+}
+};
+
+/* Built per layout by setLayout(). */
+var L = null, ROWS = null, HOW = {}, DEADROUTE = {};
+
+function buildHow(layout){
+  var how = {}, deadRoute = {};
+  function put(ch, steps){ if(ch && ch.length===1 && !(ch in how)) how[ch]=steps; }
+
+  function walk(fn){
+    layout.ROWS.forEach(function(row){ row.forEach(function(k){
+      var flags=k[5]||"";
+      if(flags.indexOf("mod")>-1) return;
+      var dead=k[6]||"";
+      fn(k[0], k[2], k[3], k[4], dead);
+    });});
+  }
+
+  /* Dead keys first, so we know how to reach each accent. */
+  walk(function(code, base, shift, alt, dead){
+    if(dead.indexOf("b")>-1 && base) deadRoute[base] = {code:code,label:base,dead:true};
+    if(dead.indexOf("s")>-1 && shift) deadRoute[shift] = {code:code,label:shift,shift:true,dead:true};
+    if(dead.indexOf("a")>-1 && alt)   deadRoute[alt]   = {code:code,label:alt,alt:true,dead:true};
+  });
+
+  function addCompositions(){
+    Object.keys(layout.DEAD).forEach(function(dk){
+      var route = deadRoute[dk]; if(!route) return;
+      var table = layout.DEAD[dk];
+      Object.keys(table).forEach(function(b){
+        var letter = how[b] || (b>="A"&&b<="Z" ? [{code:"Key"+b,label:b,shift:true}] : null);
+        if(!letter) return;
+        put(table[b], [route, letter[0]]);
+      });
+    });
+  }
+  function addSingles(){
+    walk(function(code, base, shift, alt, dead){
+      if(code==="Space"){ put(" ",[{code:"Space",label:"space"}]); return; }
+      if(base && dead.indexOf("b")===-1) put(base, [{code:code,label:base}]);
+      if(shift && dead.indexOf("s")===-1) put(shift, [{code:code,label:shift,shift:true}]);
+      if(alt && dead.indexOf("a")===-1) put(alt, [{code:code,label:alt,alt:true}]);
+    });
+  }
+
+  if(layout.deadFirst){
+    /* Plain letters still come from their own keys; only the accented set is
+       routed through the dead key. Singles are added for the base letters
+       first so the composition step knows where each vowel lives. */
+    addSingles(); 
+    /* Re-route the accented characters through the dead key even though an
+       AltGr single exists, because that is what the layout is for. */
+    Object.keys(layout.DEAD).forEach(function(dk){
+      var route = deadRoute[dk]; if(!route) return;
+      var table = layout.DEAD[dk];
+      Object.keys(table).forEach(function(b){
+        var letter = how[b]; if(!letter) return;
+        how[table[b]] = [route, letter[0]];
+      });
+    });
+  } else {
+    addSingles();
+    addCompositions();
+  }
+
+  /* A bare accent mark: press the dead key, then Space. Only if no single
+     key already produces it (AZERTY has a literal ^ on Alt Gr + 9). */
+  Object.keys(layout.DEAD).forEach(function(dk){
+    var r = deadRoute[dk];
+    if(r && !(dk in how)) how[dk] = [r, {code:"Space",label:"space"}];
+  });
+  how[" "] = [{code:"Space",label:"space"}];
+  /* Capitals of plain letters, wherever that letter physically sits. */
+  for(var i=97;i<=122;i++){
+    var lo = String.fromCharCode(i), up = lo.toUpperCase();
+    if(!(up in how) && how[lo]) how[up] = [{code:how[lo][0].code, label:up, shift:true}];
+  }
+  return { how:how, deadRoute:deadRoute };
+}
+
+/* ---------- 2. CONTENT ----------------------------------------------------
+   Same French on both layouts. Only the route to each character changes, so
+   drill text is shared and the prompts are written per layout.             */
+
+var W_ACUTE = ["\u00e9t\u00e9","\u00e9cole","caf\u00e9","\u00e9l\u00e8ve","\u00e9tudiant","t\u00e9l\u00e9phone",
+  "cin\u00e9ma","pr\u00e9f\u00e9r\u00e9","d\u00e9sol\u00e9","g\u00e9n\u00e9ral","r\u00e9ussir","\u00e9l\u00e9phant",
+  "m\u00e9tro","qualit\u00e9","universit\u00e9","\u00e9couter","r\u00e9p\u00e9ter","d\u00e9cembre","f\u00e9vrier",
+  "journ\u00e9e","id\u00e9e","\u00e9t\u00e9","march\u00e9","soci\u00e9t\u00e9","v\u00e9rit\u00e9"];
+var W_GRAVE = ["tr\u00e8s","apr\u00e8s","m\u00e8re","p\u00e8re","fr\u00e8re","\u00e9l\u00e8ve","probl\u00e8me",
+  "syst\u00e8me","l\u00e0","voil\u00e0","d\u00e9j\u00e0","o\u00f9","coll\u00e8ge","mod\u00e8le","si\u00e8cle",
+  "premi\u00e8re","derni\u00e8re","biblioth\u00e8que","p\u00e8re","cel\u00e8bre"];
+var W_CED   = ["fran\u00e7ais","\u00e7a","gar\u00e7on","le\u00e7on","fa\u00e7on","re\u00e7u","commen\u00e7ons",
+  "d\u00e9\u00e7u","aper\u00e7u","ma\u00e7on","fran\u00e7aise","le\u00e7ons"];
+var W_CIRC  = ["\u00eatre","t\u00eate","fen\u00eatre","for\u00eat","ch\u00e2teau","g\u00e2teau","h\u00f4pital",
+  "h\u00f4tel","\u00eele","co\u00fbt","go\u00fbt","ao\u00fbt","p\u00e2te","th\u00e9\u00e2tre","b\u00eate","r\u00eave",
+  "m\u00eame","\u00e2ge","dr\u00f4le","c\u00f4t\u00e9","na\u00eetre","b\u00e2timent","p\u00eache","cr\u00eape"];
+var W_TREMA = ["No\u00ebl","na\u00eff","ma\u00efs","Rapha\u00ebl","cano\u00eb","ha\u00efr","co\u00efncidence",
+  "ambigu\u00eft\u00e9","na\u00efve","h\u00e9ro\u00efne","ma\u00efs"];
+
+/* Sentences deliberately avoid a sentence-initial É, È, À or Ç. On AZERTY
+   those capitals cannot be typed at all, and a drill line a student is
+   physically unable to complete is a bug, not a challenge. */
+var SENT = [
+  "Je m'appelle Chlo\u00e9 et j'\u00e9tudie le fran\u00e7ais.",
+  "O\u00f9 est la fen\u00eatre de la salle de classe ?",
+  "Mon fr\u00e8re pr\u00e9f\u00e8re le g\u00e2teau au chocolat.",
+  "Le gar\u00e7on a d\u00e9j\u00e0 fini sa le\u00e7on de fran\u00e7ais.",
+  "Nous allons \u00e0 l'\u00e9cole tr\u00e8s t\u00f4t le matin.",
+  "Voil\u00e0 l'h\u00f4tel o\u00f9 ma m\u00e8re a pass\u00e9 l'\u00e9t\u00e9.",
+  "Qu'est-ce que tu as mang\u00e9 \u00e0 midi ?",
+  "Il fait tr\u00e8s chaud au mois d'ao\u00fbt en France.",
+  "Le ch\u00e2teau est pr\u00e8s de la for\u00eat.",
+  "No\u00ebl est ma f\u00eate pr\u00e9f\u00e9r\u00e9e.",
+  "Mon p\u00e8re a achet\u00e9 un caf\u00e9 au march\u00e9.",
+  "L'\u00e9l\u00e8ve r\u00e9p\u00e8te la m\u00eame phrase apr\u00e8s le professeur."
+];
+
+var ACCENTED = "\u00e9\u00e8\u00e0\u00f9\u00e7\u00ea\u00e2\u00ee\u00f4\u00fb\u00eb\u00ef\u00fc\u00ff" +
+               "\u00c9\u00c8\u00c0\u00d9\u00c7\u00ca\u00c2\u00ce\u00d4\u00db\u00cb\u00cf\u00dc";
+var SPECIAL = ACCENTED;
+
+var STRIP = {"\u00e9":"e","\u00e8":"e","\u00ea":"e","\u00eb":"e","\u00e0":"a","\u00e2":"a",
+             "\u00f9":"u","\u00fb":"u","\u00fc":"u","\u00ee":"i","\u00ef":"i","\u00f4":"o",
+             "\u00e7":"c","\u00ff":"y",
+             "\u00c9":"E","\u00c8":"E","\u00ca":"E","\u00cb":"E","\u00c0":"A","\u00c2":"A",
+             "\u00d9":"U","\u00db":"U","\u00dc":"U","\u00ce":"I","\u00cf":"I","\u00d4":"O",
+             "\u00c7":"C"};
+
+/* Drill text is shared; the route to it is not, so prompts are per layout.
+   Drill 6 is the exception: each layout has its own trap, and they are
+   different traps. AZERTY moves the punctuation. US-International leaves the
+   punctuation alone but turns the apostrophe and quote into accent keys, so
+   the thing that breaks is ordinary English contractions. */
+var LEVELS = [
+  { id:"l1", name:"1 · é", tag:"Accent aigu",
+    prompt:{
+      fr:"é has a key of its own — the one printed 2. No Shift, no accent key.",
+      intl:"Press <kbd>'</kbd>. Nothing appears. Then press <kbd>e</kbd>."
+    },
+    lines:["é é é é é é é é",
+           "été école café élève idée",
+           "téléphone préféré désolé répéter",
+           "cinéma journée qualité université février",
+           "L'élève a écouté le professeur."] },
+
+  { id:"l2", name:"2 · è and à", tag:"Accent grave",
+    prompt:{
+      fr:"è is the key printed 7, and à is the key printed 0. Both are plain presses.",
+      intl:"Press <kbd>`</kbd> (top left, under Esc). Nothing appears. Then press the vowel."
+    },
+    lines:["è à è à è à è à",
+           "très après mère père frère",
+           "là voilà déjà problème système",
+           "collège modèle siècle bibliothèque",
+           "Ma mère est déjà là depuis très longtemps."] },
+
+  { id:"l3", name:"3 · ç and ù", tag:"Cédille",
+    prompt:{
+      fr:"ç is the key printed 9. ù is the key printed apostrophe — and ù appears in exactly one French word.",
+      intl:"ç is <kbd>'</kbd> then <kbd>c</kbd> — the same accent key, on a consonant. ù is <kbd>`</kbd> then <kbd>u</kbd>."
+    },
+    lines:["ç ç ç ù ù ù",
+           "français ça garçon leçon façon",
+           "reçu déçu aperçu commençons",
+           "où, le seul mot français avec ù",
+           "Où est le garçon qui apprend le français ?"] },
+
+  { id:"l4", name:"4 · ê â î ô û", tag:"Circonflexe",
+    prompt:{
+      fr:"The key printed [ sends ^ and waits. Then press the vowel.",
+      intl:"<kbd>Shift</kbd> + <kbd>6</kbd> sends ^ and waits. Then press the vowel."
+    },
+    lines:["ê â î ô û ê â î ô û",
+           "être tête fenêtre forêt rêve",
+           "château gâteau âge théâtre pâte",
+           "hôtel hôpital drôle côté île",
+           "goût coût août sûr mûr",
+           "La fenêtre du château donne sur la forêt."] },
+
+  { id:"l5", name:"5 · ë ï ü", tag:"Tréma",
+    prompt:{
+      fr:"<kbd>Shift</kbd> + the key printed [ sends ¨ and waits. Then press the vowel.",
+      intl:"<kbd>Shift</kbd> + <kbd>'</kbd> sends ¨ and waits. Then press the vowel."
+    },
+    lines:["ë ï ü ë ï ü",
+           "Noël naïf maïs canoë",
+           "haïr coïncidence héroïne ambiguïté",
+           "Le tréma dit : prononce les deux voyelles.",
+           "Noël et Raphaël aiment le maïs."] },
+
+  { id:"l6", name:"6 · The rest of the keyboard", tag:"Where it bites",
+    prompt:{
+      fr:"AZERTY moves the punctuation and puts the digits behind Shift. This is where speed goes to die.",
+      intl:"US-International leaves punctuation alone — but <kbd>'</kbd> and <kbd>\"</kbd> now wait for a letter. Press <kbd>Space</kbd> after them to get the plain mark."
+    },
+    lines:{
+      fr:[", ; : ! ? , ; : ! ?",
+          "1 2 3 4 5 6 7 8 9 0",
+          "Il a 15 ans ; elle en a 12.",
+          "Vraiment ? Oui ! Bien sûr.",
+          "Le 3 mars 2026, à 14 h 30 : rendez-vous."],
+      intl:["don't can't it's we'll I'm",
+            "l'école l'été l'hôtel l'élève",
+            "\"Bonjour !\" \"Merci beaucoup !\"",
+            "C'est l'heure de l'examen.",
+            "Il m'a dit : « d'accord »."]
+    } },
+
+  { id:"l7", name:"7 · Full sentences", tag:"Everything",
+    prompt:{
+      fr:"All of it together. Note the space before ? and ! — that is correct French typography.",
+      intl:"All of it together. Note the space before ? and ! — that is correct French typography."
+    },
+    lines:SENT.slice(0,8) },
+
+  { id:"l8", name:"8 · Accent practice", tag:"Where does it go?",
+    prompt:{
+      fr:"The word appears stripped of its accents. Type it correctly — you decide which accent belongs where.",
+      intl:"The word appears stripped of its accents. Type it correctly — you decide which accent belongs where."
+    },
+    accent:true,
+    lines:W_ACUTE.concat(W_GRAVE).concat(W_CED).concat(W_CIRC).concat(W_TREMA) }
+];
+
+var BADGES = [
+  {id:"first", n:"Premier pas",     d:"Finish any drill.",                      t:function(s){ return countBest(s)>=1; }},
+  {id:"aigu",  n:"Accent aigu",     d:"Type 250 é without a miss.",        t:function(s){ return (s.cleanChars["é"]||0)>=250; }},
+  {id:"circ",  n:"Circonflexe",     d:"Type 100 circumflex letters.",           t:function(s){ return circTotal(s)>=100; }},
+  {id:"ced",   n:"Cédille",    d:"Type 100 ç.",                       t:function(s){ return (s.cleanChars["ç"]||0)>=100; }},
+  {id:"perf",  n:"Sans faute",      d:"Finish a drill at 100% accuracy.",       t:function(s){ return s.perfectDrills>=1; }},
+  {id:"w25",   n:"25 wpm",          d:"Hit 25 words per minute in a sprint.",   t:function(s){ return (s.sprintBest.wpm||0)>=25; }},
+  {id:"w40",   n:"40 wpm",          d:"Hit 40 words per minute in a sprint.",   t:function(s){ return (s.sprintBest.wpm||0)>=40; }},
+  {id:"c200",  n:"200 lpm",         d:"Hit 200 letters per minute in a sprint.",t:function(s){ return (s.sprintBest.cpm||0)>=200; }},
+  {id:"combo", n:"Série de 50",d:"Reach a 50-character clean streak.",     t:function(s){ return (s.bestStreak||0)>=50; }},
+  {id:"all",   n:"Tout le clavier", d:"Finish all eight drills.",               t:function(s){ return countBest(s)>=8; }},
+  {id:"k2000", n:"2 000 points",    d:"Score 2,000 points in one sprint.",      t:function(s){ return (s.sprintBest.points||0)>=2000; }}
+];
+function countBest(s){ var n=0; LEVELS.forEach(function(l){ if(s.best[l.id]) n++; }); return n; }
+function accentTotal(s){
+  var n=0;
+  for(var i=0;i<ACCENTED.length;i++) n += (s.cleanChars[ACCENTED[i]]||0);
+  return n;
+}
+function circTotal(s){
+  var n=0, k="êâîôû";
+  for(var i=0;i<k.length;i++) n += (s.cleanChars[k[i]]||0);
+  return n;
+}
+
+/* ---------- 2b. CHEAT SHEET + SETUP, PER LAYOUT --------------------------- */
+function taskbarSvg(ind){
+  return '<div class="fig"><svg viewBox="0 0 440 96" role="img" width="440"'
+ + ' aria-label="The Windows taskbar, with the language button to the left of the clock">'
+ + '<rect x="0" y="34" width="440" height="40" rx="7" fill="rgba(128,128,128,.16)"'
+ + ' stroke="rgba(128,128,128,.34)"/>'
+ + '<g fill="currentColor" opacity=".38">'
+ + '<rect x="150" y="47" width="14" height="14" rx="3"/>'
+ + '<rect x="174" y="47" width="14" height="14" rx="3"/>'
+ + '<rect x="198" y="47" width="14" height="14" rx="3"/></g>'
+ + '<g fill="currentColor" opacity=".45">'
+ + '<rect x="300" y="49" width="11" height="10" rx="2"/>'
+ + '<rect x="318" y="49" width="11" height="10" rx="2"/></g>'
+ + '<rect x="338" y="41" width="40" height="26" rx="6" fill="#C11430"/>'
+ + '<text x="358" y="58" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif"'
+ + ' font-size="13" font-weight="700" fill="#ffffff">'+ind+'</text>'
+ + '<text x="404" y="58" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif"'
+ + ' font-size="12" fill="currentColor" opacity=".7">9:41</text>'
+ + '<path d="M358 88 L358 74 M352 80 L358 74 L364 80" stroke="#C11430" stroke-width="2.2"'
+ + ' fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+ + '</svg>'
+ + '<div class="figcap">Bottom-right of your screen. Click it, or press '
+ + '<kbd>Windows</kbd> + <kbd>Space</kbd>, to switch.</div></div>';
+}
+
+var CHEATS = {
+fr: [
+  ["é","the key printed <kbd>2</kbd>","Its own key. No Shift, no accent key."],
+  ["è","the key printed <kbd>7</kbd>",""],
+  ["à","the key printed <kbd>0</kbd>",""],
+  ["ç","the key printed <kbd>9</kbd>",""],
+  ["ù","the key printed <kbd>'</kbd>","French has exactly one word with ù: <em>où</em>."],
+  ["ê â î ô û","the key printed <kbd>[</kbd>, then the vowel",
+   "It sends <kbd>^</kbd> and waits. Nothing appears until the vowel."],
+  ["ë ï ü","<kbd>Shift</kbd> + the key printed <kbd>[</kbd>, then the vowel","Sends <kbd>¨</kbd>."],
+  ["^ by itself","the key printed <kbd>[</kbd> then <kbd>Space</kbd>","How you escape a dead key."],
+  ["Ê Â Î Ô Û","the key printed <kbd>[</kbd>, then <kbd>Shift</kbd> + the vowel",""],
+  ["È À Ù","<kbd>Alt Gr</kbd> + <kbd>7</kbd>, then <kbd>Shift</kbd> + the letter",
+   "<kbd>Alt Gr</kbd>+<kbd>7</kbd> is a grave accent key that waits."],
+  ["É","<em>not on this layout</em>",
+   "AZERTY has no acute accent key, and <kbd>Caps Lock</kbd> does not add one — that is Mac behaviour. " +
+   "In Word or Outlook: <kbd>Ctrl</kbd> + <kbd>'</kbd> then <kbd>Shift</kbd>+<kbd>E</kbd>. " +
+   "Anywhere, with a numeric keypad: <kbd>Alt</kbd> + <kbd>0201</kbd>."],
+  ["Ç","<em>not on this layout</em>",
+   "<kbd>Alt</kbd> + <kbd>0199</kbd>, or in Word <kbd>Ctrl</kbd> + <kbd>,</kbd> then <kbd>Shift</kbd>+<kbd>C</kbd>."],
+  ["œ (as in cœur)","<em>not on either layout</em>",
+   "<kbd>Alt</kbd> + <kbd>0156</kbd>. In Word with the language set to French, typing <em>oe</em> autocorrects."],
+  ["« »","<em>not on this layout</em>",
+   "Word inserts them for you when the language is French. Otherwise <kbd>Alt</kbd>+<kbd>0171</kbd> and <kbd>Alt</kbd>+<kbd>0187</kbd>."],
+  ["a q z w m","the keys printed <kbd>Q</kbd> <kbd>A</kbd> <kbd>W</kbd> <kbd>Z</kbd> <kbd>;</kbd>",
+   "The five letters that actually move."],
+  ["1 2 3 4 5 6 7 8 9 0","<kbd>Shift</kbd> + the digit key",
+   "Unshifted those keys give &amp; é \" ' ( - è _ ç à."],
+  [",","the key printed <kbd>M</kbd>",""],
+  [".","<kbd>Shift</kbd> + the key printed <kbd>,</kbd>",""],
+  [";","the key printed <kbd>,</kbd>",""],
+  [":","the key printed <kbd>.</kbd>",""],
+  ["!","the key printed <kbd>/</kbd>",""],
+  ["?","<kbd>Shift</kbd> + the key printed <kbd>M</kbd>",""],
+  ["€","<kbd>Alt Gr</kbd> + <kbd>e</kbd>",""],
+  ["@","<kbd>Alt Gr</kbd> + <kbd>0</kbd>",""],
+  ["Switch layouts","<kbd>Windows</kbd> + <kbd>Space</kbd>","The box by the clock reads <strong>FRA</strong>."]
+],
+intl: [
+  ["é","<kbd>'</kbd> then <kbd>e</kbd>","Nothing appears after <kbd>'</kbd> — that is correct. Shortcut: <kbd>Alt Gr</kbd>+<kbd>e</kbd>."],
+  ["è à ù","<kbd>`</kbd> then the vowel","<kbd>`</kbd> is the key under <kbd>Esc</kbd>."],
+  ["ç","<kbd>'</kbd> then <kbd>c</kbd>","Same accent key, on a consonant. Shortcut: <kbd>Alt Gr</kbd>+<kbd>,</kbd>."],
+  ["ê â î ô û","<kbd>Shift</kbd>+<kbd>6</kbd> then the vowel","That sends <kbd>^</kbd> and waits."],
+  ["ë ï ü ÿ","<kbd>Shift</kbd>+<kbd>'</kbd> then the vowel","That sends <kbd>\"</kbd> as a tréma."],
+  ["É È À Ç","the same accent key, then <kbd>Shift</kbd> + the letter",
+   "Capitals work exactly like lowercase here. This is the one thing AZERTY cannot do."],
+  ["' by itself","<kbd>'</kbd> then <kbd>Space</kbd>",
+   "The apostrophe waits for a letter now. This is the change you will notice in English."],
+  ["\" by itself","<kbd>Shift</kbd>+<kbd>'</kbd> then <kbd>Space</kbd>",""],
+  ["` by itself","<kbd>`</kbd> then <kbd>Space</kbd>",""],
+  ["« »","<kbd>Alt Gr</kbd> + <kbd>[</kbd> and <kbd>Alt Gr</kbd> + <kbd>]</kbd>",""],
+  ["€","<kbd>Alt Gr</kbd> + <kbd>5</kbd>",""],
+  ["œ (as in cœur)","<em>not on either layout</em>",
+   "<kbd>Alt</kbd> + <kbd>0156</kbd>. In Word with the language set to French, typing <em>oe</em> autocorrects."],
+  ["Everything else","exactly where it is printed",
+   "Letters, digits and punctuation do not move. Only <kbd>'</kbd> <kbd>\"</kbd> <kbd>`</kbd> <kbd>~</kbd> <kbd>^</kbd> change behaviour."],
+  ["Switch layouts","<kbd>Windows</kbd> + <kbd>Space</kbd>",
+   "Both layouts show <strong>ENG</strong> by the clock, so click it to see which is ticked."]
+]
+};
+
+function installHtml(lay){
+  var extra = lay.id==="intl"
+    ? '<div class="warnbox"><strong>The one thing to know before you choose this.</strong> '
+    + 'US-International makes <kbd>\'</kbd> <kbd>"</kbd> <kbd>`</kbd> <kbd>~</kbd> and <kbd>^</kbd> wait for the next '
+    + 'letter. So typing <em>don’t</em> in an English essay gives you <em>dont</em> with a floating accent unless '
+    + 'you press <kbd>Space</kbd> after the apostrophe. Most people adjust in a day; some prefer to switch back to '
+    + 'plain English with <kbd>Windows</kbd>+<kbd>Space</kbd> for English work.</div>'
+    + '<div class="whybox"><p><strong>Why this one for French class?</strong></p>'
+    + '<p>Because the capitals work. <strong>É</strong>, <strong>À</strong>, <strong>È</strong> and '
+    + '<strong>Ç</strong> are the same keystroke as the lowercase letter with <kbd>Shift</kbd> added. On the '
+    + 'French AZERTY layout, <strong>É</strong> and <strong>Ç</strong> cannot be typed at all without '
+    + 'Alt codes or a Word-only shortcut — and a Surface has no numeric keypad for Alt codes. If you are writing '
+    + 'French essays in Word on a school laptop, this layout is the practical one.</p></div>'
+    : '<div class="warnbox"><strong>Two things AZERTY cannot do.</strong> There is no acute accent key on this '
+    + 'layout and no cedilla key, so <strong>É</strong> and <strong>Ç</strong> have no keystroke. '
+    + '<kbd>Caps Lock</kbd> does not add accents either — that is Mac behaviour, not Windows. You need '
+    + '<kbd>Alt</kbd>+<kbd>0201</kbd> with a numeric keypad, or <kbd>Ctrl</kbd>+<kbd>\'</kbd> then '
+    + '<kbd>Shift</kbd>+<kbd>E</kbd> inside Word and Outlook. Everything else on the sheet works everywhere.</div>'
+    + '<div class="whybox"><p><strong>Why choose this one anyway?</strong></p>'
+    + '<p>Because it is the keyboard in France. If the point is that students can sit down at a machine in Lyon, '
+    + 'or match a textbook screenshot, or take an exam on a French system, this is the layout that transfers. '
+    + 'It is the harder road — five letters move and the digits go behind <kbd>Shift</kbd> — and that is '
+    + 'the road this tool is for.</p></div>';
+
+  return '<details class="install">'
+ + '<summary>I don’t have the ' + esc(lay.name) + ' keyboard yet &mdash; how do I add it?</summary>'
+ + '<p class="small muted" style="margin-top:6px">About a minute. You are adding a <em>keyboard</em>, not turning '
+ + 'your computer into French &mdash; menus, files and English typing all stay exactly as they are, and nothing has '
+ + 'to download. This works on a school laptop without an admin password.</p>'
+ + '<ol class="steps">'
+ + '<li>Open <strong>Settings</strong>: press <kbd>Windows</kbd> + <kbd>i</kbd>.</li>'
+ + '<li>Go to <span class="path">Time &amp; language<span class="arrow">&rsaquo;</span>Language &amp; region</span>.</li>'
+ + '<li>Under <strong>Preferred languages</strong>, find <strong>English (United States)</strong> and click the '
+ + '<strong>&hellip;</strong> at the right of that row.</li>'
+ + '<li>Choose <strong>Language options</strong>.</li>'
+ + '<li>Scroll to <strong>Keyboards</strong> and click <strong>Add a keyboard</strong>.</li>'
+ + '<li>Pick <strong>' + esc(lay.addName) + '</strong>. It is ready immediately &mdash; no restart. '
+ + lay.addNote + '</li>'
+ + '<li>Press <kbd>Windows</kbd> + <kbd>Space</kbd> to switch, then run the test above.</li>'
+ + '</ol>'
+ + taskbarSvg(lay.indicator)
+ + '<p class="small" style="margin-top:12px">Microsoft&rsquo;s own instructions, if a screen looks different: '
+ + '<a href="https://support.microsoft.com/en-us/windows/manage-the-input-and-display-language-settings-in-windows-12a10cb4-8626-9b77-0ccb-5013e0c7c7a2" '
+ + 'target="_blank" rel="noopener">Manage language and keyboard settings in Windows</a>.</p>'
+ + extra
+ + '<details><summary>Do I need the French language pack too?</summary>'
+ + '<p class="yesno"><b>No.</b> Adding the keyboard is all you need, and it is the safer choice. Nothing downloads '
+ + 'and nothing about your laptop changes.</p>'
+ + '<p class="small" style="margin-top:10px">If you install the full French language anyway, you also get '
+ + '<strong>French spellcheck</strong> (worth having — without it a correctly accented French paragraph is '
+ + 'underlined in red as though every word were misspelled English), French dictation and read-aloud, and French '
+ + 'handwriting recognition on a Surface.</p>'
+ + '<div class="warnbox">Adding French moves it up your language list, and Windows uses that order to decide what '
+ + 'language <em>websites and Store apps</em> show you — so pages may start appearing in French. Changing the '
+ + '<strong>Windows display language</strong> is a separate switch that turns every menu French; leave it alone.</div>'
+ + '<p class="undo"><strong>To undo:</strong> Settings <span class="arrow">&rsaquo;</span> Time &amp; language '
+ + '<span class="arrow">&rsaquo;</span> Language &amp; region, click the <strong>&hellip;</strong> next to French '
+ + 'and choose <strong>Remove</strong>.</p>'
+ + '<p class="small muted" style="margin-top:10px">Word and Outlook are separate — they do their own French '
+ + 'spellcheck through the Editor language settings inside Office, whether or not Windows has the language installed. '
+ + 'Setting a document’s language to French is also what makes Word autocorrect <em>oe</em> into '
+ + '<strong>œ</strong> and quotes into <strong>« »</strong>.</p>'
+ + '</details></details>';
+}
+
+/* ---------- 3. STATE ------------------------------------------------------ */
+var LS = "rjclavier_v1";
+var state = {
+  name:"", best:{}, sprintBest:{}, weak:{}, cleanChars:{},
+  totalMs:0, sessions:0, perfectDrills:0, bestStreak:0, custom:null,
+  firstUse:null, firstSprint:null, badges:{}, layout:"intl"
+};
+function load(){
+  try{ var raw=localStorage.getItem(LS);
+    if(raw){ var o=JSON.parse(raw); for(var k in o) if(o.hasOwnProperty(k)) state[k]=o[k]; } }catch(e){}
+  if(!state.firstUse) state.firstUse = today();
+  if(!state.sprintBest) state.sprintBest = {};
+  if(!state.cleanChars) state.cleanChars = {};
+  if(!state.badges) state.badges = {};
+  if(!LAYOUTS[state.layout]) state.layout = "intl";
+}
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+var saveTimer=null;
+function scheduleSave(){ if(saveTimer) return;
+  saveTimer = setTimeout(function(){ saveTimer=null; save(); }, 1500); }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function mmdd(){ var d=new Date(); return pad(d.getMonth()+1)+pad(d.getDate()); }
+function pad(n){ return (n<10?"0":"")+n; }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+function listToLink(lines){
+  var payload = btoa(unescape(encodeURIComponent(lines.join("\n"))));
+  return location.origin + location.pathname + "#list=" + encodeURIComponent(payload);
+}
+function listFromHash(){
+  var m = String(location.hash||"").match(/^#list=(.+)$/);
+  if(!m) return null;
+  try{
+    var txt = decodeURIComponent(escape(atob(decodeURIComponent(m[1]))));
+    var lines = txt.split("\n").map(function(s){ return s.trim(); })
+                   .filter(function(s){ return s.length>0; });
+    return lines.length ? lines : null;
+  }catch(e){ return null; }
+}
+function flashNote(msg){
+  var el = document.getElementById("flashNote");
+  if(!el){ el=document.createElement("div"); el.id="flashNote";
+    el.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;"
+      + "background:var(--panel);border:1px solid var(--red);color:var(--ink);padding:9px 16px;"
+      + "border-radius:9px;font-size:.86rem;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.18)";
+    document.body.appendChild(el); }
+  el.textContent = msg; el.style.display="block";
+  clearTimeout(el.__t); el.__t = setTimeout(function(){ el.style.display="none"; }, 2200);
+}
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function stripAccents(s){ return s.replace(/[^\x00-\x7F]/g,function(c){ return STRIP[c] || c; }); }
+
+/* ---------- 4. KEYBOARD --------------------------------------------------- */
+var kbEl, keyEls = {};
+
+/* Switching layout rebuilds every route, every keycap and every prompt.
+   The drill text is untouched, so a student can change layout mid-practice
+   and carry on with the same words. */
+function setLayout(id){
+  if(!LAYOUTS[id]) id = "intl";
+  L = LAYOUTS[id];
+  ROWS = L.ROWS;
+  var built = buildHow(L);
+  HOW = built.how; DEADROUTE = built.deadRoute;
+  state.layout = id;
+  if(typeof save === "function") save();
+  if(kbEl){ keyEls = {}; renderKb(); }
+  paintLayout();
+  if(pr && pr.level) startLevel(pr.level.id);
+}
+
+function paintLayout(){
+  var el;
+  el = document.getElementById("subLine");
+  if(el) el.innerHTML = "Type French on a US keyboard &mdash; Windows <strong>" + esc(L.full) + "</strong> layout";
+  el = document.getElementById("layNote");
+  if(el) el.textContent = L.blurb;
+  Array.prototype.forEach.call(document.querySelectorAll(".segbtn"), function(b){
+    var on = b.getAttribute("data-lay") === L.id;
+    b.className = "segbtn" + (on ? " on" : "");
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  el = document.getElementById("checkIntro");
+  if(el) el.innerHTML = "Your keys are printed in English, but Windows can send French characters instead. "
+    + "Switch with <kbd>Windows</kbd> <span class=\"plus\">+</span> <kbd>Space</kbd> &mdash; "
+    + "the box by the clock should read <strong>" + esc(L.indicator) + "</strong>.";
+  el = document.getElementById("checkAsk");
+  if(el) el.innerHTML = "<strong>Test it:</strong> click the box and " + L.probe.ask + ".";
+  el = document.getElementById("turnOn");
+  if(el) el.innerHTML = "<strong>Switch between English and French:</strong> <kbd>Windows</kbd> + <kbd>Space</kbd>. "
+    + "The indicator by the clock shows <strong>" + esc(L.indicator) + "</strong> for this layout.";
+  el = document.getElementById("cheatHead");
+  if(el) el.innerHTML = "Shortcut sheet &middot; " + esc(L.full);
+  el = document.getElementById("installHost1"); if(el) el.innerHTML = installHtml(L);
+  el = document.getElementById("installHost2"); if(el) el.innerHTML = installHtml(L);
+  el = document.getElementById("cheat");
+  if(el) el.innerHTML = CHEATS[L.id].map(function(r){
+    return "<tr><td style='font-size:1.05rem'>"+r[0]+"</td><td>"+r[1]+"</td><td class='muted tiny'>"+r[2]+"</td></tr>";
+  }).join("");
+  var probe = document.getElementById("probe"), verdict = document.getElementById("verdict");
+  if(probe){ probe.value = ""; }
+  if(verdict){ verdict.className = "verdict"; }
+}
+
+/* Drill text is shared between layouts; prompts and drill 6 are not. */
+function promptFor(lvl){
+  var p = lvl.prompt;
+  if(p && typeof p === "object") return p[L.id] || p.intl || "";
+  return p || "";
+}
+function linesFor(lvl){
+  var l = lvl.lines;
+  if(l && !(l instanceof Array)) return l[L.id] || l.intl || [];
+  return l || [];
+}
+function altGrHints(){
+  var need={}, seen={};
+  try{
+    LEVELS.forEach(function(l){
+      linesFor(l).forEach(function(line){
+        for(var i=0;i<line.length;i++){
+          var ch=line[i];
+          if(seen[ch]) continue;
+          seen[ch]=1;
+          var r=HOW[ch];
+          if(r && r.length===1 && r[0].alt) need[r[0].code]=ch;
+        }
+      });
+    });
+  }catch(e){}
+  return need;
+}
+function renderKb(){
+  var html="", AG=altGrHints();
+  ROWS.forEach(function(row){
+    html += '<div class="krow">';
+    row.forEach(function(k){
+      var code=k[0], us=k[1], base=k[2], shift=k[3], flags=k[5]||"";
+      var cls="k";
+      if(flags.indexOf("wider")>-1) cls+=" wider"; else if(flags.indexOf("wide")>-1) cls+=" wide";
+      if(flags.indexOf("space")>-1) cls+=" space";
+      if(flags.indexOf("mod")>-1) cls+=" mod";
+      var inner="";
+      if(flags.indexOf("mod")>-1){ inner = esc(base); }
+      else {
+        if(us) inner += '<span class="us">'+esc(us)+'</span>';
+        if(shift && shift!==base.toUpperCase()) inner += '<span class="sh">'+esc(shift)+'</span>';
+        if(AG[code]) inner += '<span class="ag">'+esc(AG[code])+'</span>';
+        inner += '<span class="main">'+esc(base)+'</span>';
+      }
+      html += '<div class="'+cls+'" data-code="'+code+'">'+inner+'</div>';
+    });
+    html += '</div>';
+  });
+  kbEl.innerHTML = html;
+  Array.prototype.forEach.call(kbEl.querySelectorAll(".k"), function(el){
+    keyEls[el.getAttribute("data-code")] = el; });
+}
+function clearKb(){ for(var c in keyEls) if(keyEls.hasOwnProperty(c)){
+  keyEls[c].className = keyEls[c].className.replace(/\s*(hot2|hot|dead)\b/g,""); } }
+function keyChips(steps, activeIndex, dim){
+  return steps.map(function(s,i){
+    var bits=[];
+    if(s.shift) bits.push("<kbd>Shift</kbd>");
+    if(s.alt)   bits.push("<kbd>Alt Gr</kbd>");
+    bits.push("<kbd>"+esc(s.label==="space"?"Space":s.label)+"</kbd>");
+    var cls = "step" + (dim ? " dim" : "");
+    var style = (!dim && i===activeIndex) ? ' style="font-weight:700"' : '';
+    return '<span class="'+cls+'"'+style+'>' + bits.join(' <span class="plus">+</span> ') + '</span>';
+  }).join(' <span class="then">then</span> ');
+}
+function highlight(ch, stepIndex, after){
+  clearKb();
+  var howEl = document.getElementById("howto");
+  var steps = HOW[ch];
+  if(!steps){
+    /* Some characters genuinely have no keystroke on a layout (É and Ç on
+       AZERTY). Saying so beats a blank hint the student reads as a bug. */
+    var why = L.MISSING && L.MISSING[ch];
+    howEl.innerHTML = why
+      ? '<span class="tiny" style="color:var(--warn);font-weight:600">\u26a0 '+esc(ch)+' \u2014 '+esc(why)
+        +' See the shortcut sheet for the Alt code.</span>'
+      : "";
+    return;
+  }
+  var step = steps[stepIndex] || steps[0];
+  var el = keyEls[step.code];
+  if(el){ el.className += " hot"; if(step.dead) el.className += " dead"; }
+  if(step.shift){ if(keyEls.ShiftLeft) keyEls.ShiftLeft.className+=" hot2";
+                  if(keyEls.ShiftRight) keyEls.ShiftRight.className+=" hot2"; }
+  if(step.alt && keyEls.AltRight) keyEls.AltRight.className += " hot2";
+  var joined = keyChips(steps, stepIndex, false);
+  if(steps.length>1 && stepIndex===0)
+    joined += ' <span class="then">&mdash; nothing appears after the first key, that is correct</span>';
+  // Lookahead. Without it a space-separated line reads as "press space" half the time.
+  var ahead = after !== undefined ? HOW[after] : null;
+  if(ahead){
+    var lk = keyChips(ahead, -1, true);
+    joined += ' <span class="then">then</span> ' + lk;
+    var lkEl = keyEls[ahead[0].code];
+    if(lkEl && lkEl.className.indexOf("hot")===-1) lkEl.className += " next";
+  }
+  howEl.innerHTML = '<span class="muted tiny">Next:</span> ' + joined;
+}
+
+/* ---------- 5. SHARED TYPING CORE ----------------------------------------- */
+function makeEngine(opts){
+  var eng = {
+    target:"", typed:"", seen:0, el:opts.el, cap:opts.cap,
+    onChar:opts.onChar, onDone:opts.onDone, onPaste:opts.onPaste, accentMode:false, deadPending:false
+  };
+  eng.setTarget = function(t, accentMode){
+    eng.target=t; eng.typed=""; eng.seen=0; eng.accentMode=!!accentMode;
+    eng.cap.value=""; eng.render();
+    if(eng.el.parentNode) eng.el.parentNode.className = t ? "tgt-wrap armed" : "tgt-wrap";
+  };
+  eng.focus = function(){ try{ eng.cap.focus({preventScroll:true}); }catch(e){ eng.cap.focus(); } };
+  eng.render = function(){
+    var t=eng.target, typed=eng.typed, html="";
+    for(var i=0;i<t.length;i++){
+      var cls="ch", shown, extra="";
+      if(i<typed.length){
+        if(typed[i]===t[i]){ cls+=" done"; shown=t[i]; }
+        else {
+          // Show what they actually produced, with the target beside it in small grey,
+          // so a wrong accent is visible instead of silently red.
+          cls+=" err"; shown = (typed[i]===" ") ? "\u00b7" : typed[i];
+          extra = '<span class="ch want">'+esc(t[i]===" " ? "\u2423" : t[i])+'</span>';
+        }
+      } else {
+        if(i===typed.length) cls += " cur";
+        shown = eng.accentMode ? stripAccents(t[i]) : t[i];
+      }
+      html += '<span class="'+cls+'">'+esc(shown===" " ? " " : shown)+'</span>' + extra;
+    }
+    for(var j=t.length;j<typed.length;j++) html += '<span class="ch err">'+esc(typed[j])+'</span>';
+    eng.el.innerHTML = html;
+    if(opts.showKeys){
+      var next = t[typed.length], after = t[typed.length+1];
+      if(next !== undefined){
+        var steps = HOW[next];
+        highlight(next, (steps && steps.length>1 && eng.deadPending) ? 1 : 0, after);
+      } else { clearKb(); document.getElementById("howto").innerHTML=""; }
+    }
+    if(opts.bar){
+      var pct = t.length ? Math.min(100, Math.round(typed.length/t.length*100)) : 0;
+      document.getElementById(opts.bar).style.width = pct+"%";
+    }
+  };
+  eng.cap.addEventListener("keydown", function(e){
+    if(e.key === "Dead"){ eng.deadPending = true; setTimeout(eng.render,0); }
+    else if(e.key.length===1 || e.key==="Backspace"){ eng.deadPending = false; }
+    if(e.key==="Tab") e.preventDefault();
+    if(e.key==="Enter"){ e.preventDefault(); if(eng.target) eng.onDone(); }
+  });
+  eng.cap.addEventListener("paste", function(e){ e.preventDefault(); });
+  eng.cap.addEventListener("drop",  function(e){ e.preventDefault(); });
+  eng.cap.addEventListener("input", function(){
+    var v = eng.cap.value; eng.deadPending = false;
+    if(!eng.target) return;
+    // A dead key plus its letter is 2 characters. More than that at once is pasted text, not typing.
+    if(v.length - eng.seen > 2){
+      eng.cap.value = eng.typed; eng.render();
+      if(typeof eng.onPaste === "function") eng.onPaste();
+      return;
+    }
+    if(v.length > eng.seen){
+      for(var i=eng.seen;i<v.length;i++) eng.onChar(v[i], eng.target[i], i);
+    }
+    eng.seen = v.length; eng.typed = v; eng.render();
+    // Forgiving: reaching the end of the line moves on, clean or not. A student is never
+    // stuck backspacing to hunt one bad character.
+    if(v.length >= eng.target.length) eng.onDone();
+  });
+  if(eng.el.parentNode) eng.el.parentNode.addEventListener("click", eng.focus);
+  return eng;
+}
+
+/* ---------- 6. PRACTICE MODE ---------------------------------------------- */
+var pr = { level:null, lines:[], idx:0, started:0, chars:0, errs:0, lineClean:true, drillClean:true };
+var pEng;
+function startLevel(id){
+  var lvl=null;
+  LEVELS.forEach(function(l){ if(l.id===id) lvl=l; });
+  if(id==="custom" && state.custom && state.custom.length)
+    lvl = {id:"custom", name:"Class list", tag:"From your teacher",
+           prompt:"Your teacher's list. Same keys, your own vocabulary.", lines:state.custom.slice()};
+  if(!lvl) return;
+  pr.level=lvl; pr.lines=linesFor(lvl).slice();
+  if(lvl.accent){ shuffle(pr.lines); pr.lines=pr.lines.slice(0,12); }
+  pr.idx=0; pr.started=0; pr.chars=0; pr.errs=0; pr.drillClean=true;
+  document.getElementById("drillTitle").textContent = lvl.name.replace(/^\d+\s*·\s*/,"");
+  document.getElementById("drillPrompt").innerHTML = promptFor(lvl);
+  markActive(id);
+  loadLine();
+  document.getElementById("drillPanel").scrollIntoView({block:"nearest"});
+}
+function loadLine(){
+  if(pr.idx >= pr.lines.length){ finishLevel(); return; }
+  pr.lineClean = true;
+  pEng.setTarget(pr.lines[pr.idx], !!(pr.level && pr.level.accent));
+  pEng.focus();
+  updatePracticeStats();
+}
+function updatePracticeStats(){
+  var mins = pr.started ? (Date.now()-pr.started)/60000 : 0;
+  var ready = mins>0 && pr.chars>=10;
+  var wpm = ready ? Math.round((pr.chars/5)/mins) : 0;
+  var cpm = ready ? Math.round(pr.chars/mins) : 0;
+  var tot = pr.chars + pr.errs;
+  document.getElementById("sWpm").textContent = wpm>0 ? wpm : "—";
+  document.getElementById("sCpm").textContent = cpm>0 ? cpm : "—";
+  document.getElementById("sAcc").textContent = tot ? Math.round(pr.chars/tot*100)+"%" : "—";
+  document.getElementById("sLine").textContent = (Math.min(pr.idx+1,pr.lines.length))+" / "+pr.lines.length;
+  document.getElementById("sErr").textContent = pr.errs;
+}
+function finishLevel(){
+  var lvl=pr.level;
+  var mins = pr.started ? (Date.now()-pr.started)/60000 : 0;
+  var ready = mins>0 && pr.chars>=10;
+  var wpm = ready ? Math.round((pr.chars/5)/mins) : 0;
+  var cpm = ready ? Math.round(pr.chars/mins) : 0;
+  var tot = pr.chars+pr.errs, acc = tot ? Math.round(pr.chars/tot*100) : 0;
+  var prev = state.best[lvl.id];
+  if(!prev || wpm>prev.wpm || (wpm===prev.wpm && acc>prev.acc))
+    state.best[lvl.id] = {wpm:wpm, cpm:cpm, acc:acc, date:today(), name:lvl.name};
+  else state.best[lvl.id].date = today();
+  if(acc===100 && pr.chars>20) state.perfectDrills++;
+  state.totalMs += Math.round(mins*60000); state.sessions++;
+  save();
+  document.getElementById("target").innerHTML =
+      '<div style="font-size:1rem;line-height:1.6"><strong style="font-size:1.15rem">Drill complete.</strong><br>'
+    + esc(lvl.name.replace(/^\d+\s*·\s*/,"")) + ' — <strong>'+wpm+' wpm</strong> ('+cpm+' letters/min), '
+    + '<strong>'+acc+'%</strong> accuracy, '+pr.errs+' mistake'+(pr.errs===1?"":"s")+'.'
+    + (prev ? '<br><span class="muted small">Previous best: '+prev.wpm+' wpm at '+prev.acc+'%.</span>' : '')
+    + '</div>';
+  clearKb(); document.getElementById("howto").innerHTML="";
+  document.getElementById("bar").style.width="100%";
+  pEng.target=""; document.getElementById("target").parentNode.className="tgt-wrap";
+  renderLevels(); renderProgress(); renderBadges(); markActive(null);
+}
+
+/* ---------- 7. SPRINT MODE ------------------------------------------------- */
+var sp = { on:false, endsAt:0, tick:null, chars:0, errs:0, special:0, points:0,
+           streak:0, bestStreak:0, pool:[], pi:0, started:0, len:60 };
+var sEng;
+function poolFor(kind){
+  if(kind==="acute") return shuffle(W_ACUTE.slice());
+  if(kind==="grave") return shuffle(W_GRAVE.concat(W_CED));
+  if(kind==="hat")   return shuffle(W_CIRC.concat(W_TREMA));
+  if(kind==="sent")  return shuffle(SENT.slice());
+  if(kind==="custom" && state.custom && state.custom.length) return shuffle(state.custom.slice());
+  return shuffle(W_ACUTE.concat(W_GRAVE).concat(W_CED).concat(W_CIRC).concat(W_TREMA));
+}
+function sprintLine(){
+  if(sp.kind==="sent" || sp.kind==="custom"){
+    if(sp.pi>=sp.pool.length) sp.pi=0;
+    return sp.pool[sp.pi++];
+  }
+  var w=[];
+  for(var i=0;i<6;i++){ if(sp.pi>=sp.pool.length){ shuffle(sp.pool); sp.pi=0; } w.push(sp.pool[sp.pi++]); }
+  return w.join(" ");
+}
+function startSprint(){
+  sp.len = parseInt(document.getElementById("sprintLen").value,10);
+  sp.kind = document.getElementById("sprintPool").value;
+  if(sp.kind==="custom" && !(state.custom && state.custom.length)){
+    alert("No class list saved yet. Add one under Practice → Teacher: load your own word list.");
+    return;
+  }
+  sp.pool = poolFor(sp.kind); sp.pi = 0;
+  sp.on=true; sp.chars=0; sp.errs=0; sp.special=0; sp.points=0; sp.streak=0; sp.bestStreak=0;
+  sp.started=0; sp.endsAt=0;
+  document.getElementById("sprintResult").innerHTML="";
+  document.getElementById("clock").textContent = sp.len;
+  document.getElementById("clock").className = "clock";
+  document.getElementById("score").textContent = "0";
+  document.getElementById("combo").className = "combo hidden";
+  sEng.setTarget(sprintLine(), false);
+  sEng.focus();
+  updateSprintStats();
+}
+function sprintTick(){
+  if(!sp.on || !sp.started) return;
+  var left = Math.max(0, Math.ceil((sp.endsAt - Date.now())/1000));
+  var c = document.getElementById("clock");
+  c.textContent = left;
+  c.className = "clock" + (left<=10 ? " low" : "");
+  updateSprintStats();
+  if(left<=0) endSprint();
+}
+function multiplier(){ return Math.min(2, 1 + Math.floor(sp.streak/20)*0.1); }
+function updateSprintStats(){
+  var mins = sp.started ? (Date.now()-sp.started)/60000 : 0;
+  var ready = mins>0 && sp.chars>=10;
+  var wpm = ready ? Math.round((sp.chars/5)/mins) : 0;
+  var cpm = ready ? Math.round(sp.chars/mins) : 0;
+  var tot = sp.chars+sp.errs;
+  document.getElementById("spWpm").textContent = wpm>0?wpm:"—";
+  document.getElementById("spCpm").textContent = cpm>0?cpm:"—";
+  document.getElementById("spAcc").textContent = tot?Math.round(sp.chars/tot*100)+"%":"—";
+  document.getElementById("spAcc2").textContent = sp.special;
+  document.getElementById("score").textContent = sp.points.toLocaleString();
+  var cm = document.getElementById("combo");
+  if(sp.streak>=10){ cm.className="combo"; cm.textContent = "×"+multiplier().toFixed(1)+"  streak "+sp.streak; }
+  else cm.className="combo hidden";
+}
+function floatPts(n){
+  var f=document.getElementById("float");
+  f.textContent = "+"+n; f.className="float";
+  void f.offsetWidth; f.className="float go";
+}
+function endSprint(){
+  if(!sp.on) return;
+  sp.on=false;
+  if(sp.tick){ clearInterval(sp.tick); sp.tick=null; }
+  var mins = sp.len/60;
+  var wpm = Math.round((sp.chars/5)/mins);
+  var cpm = Math.round(sp.chars/mins);
+  var tot = sp.chars+sp.errs, acc = tot?Math.round(sp.chars/tot*100):0;
+  var b = state.sprintBest || {};
+  var isPB = !b.points || sp.points > b.points;
+  if(!state.firstSprint) state.firstSprint = {wpm:wpm, cpm:cpm, points:sp.points, date:today()};
+  if(isPB) state.sprintBest = {wpm:wpm, cpm:cpm, acc:acc, points:sp.points, date:today(), len:sp.len};
+  else {
+    state.sprintBest.wpm = Math.max(b.wpm||0, wpm);
+    state.sprintBest.cpm = Math.max(b.cpm||0, cpm);
+    state.sprintBest.acc = Math.max(b.acc||0, acc);
+    state.sprintBest.date = today();
+  }
+  if(sp.bestStreak > (state.bestStreak||0)) state.bestStreak = sp.bestStreak;
+  state.totalMs += sp.len*1000; state.sessions++;
+  save();
+  sEng.target="";
+  document.getElementById("sTarget").parentNode.className="tgt-wrap";
+  document.getElementById("sTarget").innerHTML =
+    '<span class="muted" style="font-size:1rem">Time. Press <strong>Start sprint</strong> to go again.</span>';
+  document.getElementById("sprintResult").innerHTML =
+      '<div class="result"><div class="big">'+sp.points.toLocaleString()+'</div>'
+    + '<div class="sub">points &middot; <strong>'+wpm+'</strong> wpm &middot; <strong>'+cpm+'</strong> letters/min '
+    + '&middot; <strong>'+acc+'%</strong> accuracy &middot; '+sp.special+' accented characters '
+    + '&middot; best streak '+sp.bestStreak+'</div>'
+    + (isPB ? '<div class="pbtag">New personal best</div>'
+            : '<div class="muted small" style="margin-top:6px">Your best is '
+              + (b.points||0).toLocaleString()+' points at '+(b.wpm||0)+' wpm.</div>')
+    + (state.firstSprint && !isPB ? '' : '')
+    + '</div>';
+  clearKb();
+  renderBadges(); renderProgress(); renderMyCode();
+}
+
+/* ---------- 8. LEVEL LIST / PROGRESS / BADGES ------------------------------ */
+function renderLevels(){
+  var host=document.getElementById("levels"), html="";
+  LEVELS.forEach(function(l){
+    var b=state.best[l.id];
+    html += '<button class="lvl" type="button" data-id="'+l.id+'"><span class="lt">'+esc(l.name)
+         + (b?'<span class="star">'+b.wpm+' wpm · '+b.acc+'%</span>':'')
+         + '</span><span class="ld">'+esc(l.tag)+'</span></button>';
+  });
+  if(state.custom && state.custom.length){
+    var bc=state.best["custom"];
+    html += '<button class="lvl" type="button" data-id="custom"><span class="lt">Class list'
+         + (bc?'<span class="star">'+bc.wpm+' wpm · '+bc.acc+'%</span>':'')
+         + '</span><span class="ld">'+state.custom.length+' item'+(state.custom.length===1?"":"s")
+         + ' from your teacher</span></button>';
+  }
+  host.innerHTML = html;
+  Array.prototype.forEach.call(host.querySelectorAll(".lvl"), function(b){
+    b.addEventListener("click", function(){ startLevel(b.getAttribute("data-id")); });
+  });
+}
+function markActive(id){
+  Array.prototype.forEach.call(document.querySelectorAll(".lvl"), function(b){
+    b.className = "lvl" + (id && b.getAttribute("data-id")===id ? " active" : "");
+  });
+}
+function weakList(){
+  var arr=[];
+  for(var c in state.weak) if(state.weak.hasOwnProperty(c) && c.trim()) arr.push([c,state.weak[c]]);
+  arr.sort(function(a,b){ return b[1]-a[1]; });
+  return arr.slice(0,8);
+}
+function overall(){
+  var done=countBest(state), wsum=0, asum=0, n=0;
+  for(var k in state.best) if(state.best.hasOwnProperty(k)){ wsum+=state.best[k].wpm; asum+=state.best[k].acc; n++; }
+  return { done:done, of:LEVELS.length, wpm:n?Math.round(wsum/n):0, acc:n?Math.round(asum/n):0,
+           mins:Math.round(state.totalMs/60000) };
+}
+function renderProgress(){
+  var o=overall(), w=weakList(), sb=state.sprintBest||{}, rows="";
+  LEVELS.forEach(function(l){
+    var b=state.best[l.id];
+    rows += '<tr><td>'+esc(l.name)+'</td><td class="num">'+(b?b.wpm:"—")
+         + '</td><td class="num">'+(b?b.acc+"%":"—")+'</td><td class="muted tiny">'
+         + (b?b.date:"not attempted")+'</td></tr>';
+  });
+  if(state.best["custom"]){
+    var bc=state.best["custom"];
+    rows += '<tr><td>Class list</td><td class="num">'+bc.wpm+'</td><td class="num">'+bc.acc
+         + '%</td><td class="muted tiny">'+bc.date+'</td></tr>';
+  }
+  var gain = "";
+  if(state.firstSprint && sb.wpm && state.firstSprint.wpm){
+    var d = sb.wpm - state.firstSprint.wpm;
+    if(d>0) gain = ' &middot; up <strong>'+d+' wpm</strong> since your first sprint on '+state.firstSprint.date;
+  }
+  document.getElementById("progressBody").innerHTML =
+      '<p class="small"><strong>'+o.done+' of '+o.of+'</strong> drills completed &middot; average <strong>'
+    + o.wpm+' wpm</strong> at <strong>'+o.acc+'%</strong> &middot; about <strong>'+o.mins+' min</strong> of practice.</p>'
+    + (sb.points ? '<p class="small">Best sprint: <strong>'+sb.points.toLocaleString()+' points</strong> — '
+        + sb.wpm+' wpm, '+sb.cpm+' letters/min, '+sb.acc+'% on '+sb.date+gain+'.</p>' : '')
+    + '<table><thead><tr><th>Drill</th><th style="text-align:right">Best wpm</th>'
+    + '<th style="text-align:right">Accuracy</th><th>Last</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    + (w.length ? '<p class="small" style="margin-top:12px"><strong>Keys to work on:</strong> '
+        + w.map(function(p){ return '<span class="chip weak">'+esc(p[0])+' &times;'+p[1]+'</span>'; }).join("")+'</p>' : '');
+}
+function renderBadges(){
+  var html="", newly=[];
+  BADGES.forEach(function(b){
+    var got=false;
+    try{ got = b.t(state); }catch(e){ got=false; }
+    if(got && !state.badges[b.id]){ state.badges[b.id]=today(); newly.push(b.n); }
+    html += '<div class="badge'+(got?" got":"")+'"><div class="bn">'+(got?"★ ":"☆ ")+esc(b.n)+'</div>'
+          + '<div class="bd">'+esc(b.d)+'</div></div>';
+  });
+  if(newly.length) save();
+  document.getElementById("badges").innerHTML = html;
+}
+
+/* ---------- 9. CODES, REPORT, LEADERBOARD ---------------------------------- */
+function hash(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("000000"+h.toString(36).toUpperCase()).slice(-6);
+}
+function scoreCode(){
+  var sb = state.sprintBest||{};
+  var body = ["RC1", (state.name||"sans nom").replace(/[~|]/g,"-"), mmdd(),
+              sb.wpm||0, sb.cpm||0, sb.acc||0, sb.points||0].join("~");
+  return body + "~" + hash(body);
+}
+function parseCode(line){
+  var m = String(line).match(/RC1~[^~]+~\d{4}~\d+~\d+~\d+~\d+~[0-9A-Z]{6}/);
+  if(!m) return null;
+  var p = m[0].split("~");
+  var body = p.slice(0,7).join("~");
+  return { name:p[1], date:p[2], wpm:+p[3], cpm:+p[4], acc:+p[5], points:+p[6],
+           ok: hash(body)===p[7] };
+}
+function renderMyCode(){
+  var el = document.getElementById("myCode");
+  if(!state.sprintBest || !state.sprintBest.points){
+    el.textContent = "Finish a sprint first — then your code appears here."; return;
+  }
+  el.textContent = scoreCode();
+}
+function summaryText(){
+  var o=overall(), w=weakList(), sb=state.sprintBest||{}, L=[];
+  L.push("Raider Teclado — Spanish typing practice");
+  L.push("Student: " + (state.name||"(no name entered)"));
+  L.push("Date: " + today());
+  L.push("");
+  L.push("Drills completed: "+o.done+" of "+o.of);
+  L.push("Average speed: "+o.wpm+" words per minute");
+  L.push("Average accuracy: "+o.acc+"%");
+  L.push("Practice time: about "+o.mins+" minutes");
+  if(sb.points) L.push("Best sprint: "+sb.points+" points, "+sb.wpm+" wpm, "+sb.cpm+" letters/min, "+sb.acc+"%");
+  L.push("");
+  L.push("Per drill:");
+  LEVELS.forEach(function(l){
+    var b=state.best[l.id];
+    L.push("  "+l.name+" — "+(b? b.wpm+" wpm, "+b.acc+"%, "+b.date : "not attempted"));
+  });
+  if(state.best["custom"]) L.push("  Class list — "+state.best["custom"].wpm+" wpm, "
+    +state.best["custom"].acc+"%, "+state.best["custom"].date);
+  if(w.length){ L.push(""); L.push("Keys still missed most: "
+    + w.map(function(p){ return p[0]+" ("+p[1]+")"; }).join(", ")); }
+  L.push("");
+  L.push("Score code: " + scoreCode());
+  return L.join("\n");
+}
+function reportHtml(){
+  var o=overall(), w=weakList(), sb=state.sprintBest||{}, rows="";
+  LEVELS.forEach(function(l){
+    var b=state.best[l.id];
+    rows += "<tr><td>"+esc(l.name)+"</td><td class='n'>"+(b?b.wpm:"&mdash;")+"</td><td class='n'>"
+         + (b?b.acc+"%":"&mdash;")+"</td><td>"+(b?b.date:"not attempted")+"</td></tr>";
+  });
+  if(state.best["custom"]){ var bc=state.best["custom"];
+    rows += "<tr><td>Class list</td><td class='n'>"+bc.wpm+"</td><td class='n'>"+bc.acc+"%</td><td>"+bc.date+"</td></tr>"; }
+  return "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><title>Raider Teclado report — "
+    + esc(state.name||"student") + "</title><style>"
+    + "body{font-family:'Segoe UI',system-ui,sans-serif;max-width:660px;margin:36px auto;padding:0 20px;color:#1b1c1f;line-height:1.55}"
+    + "h1{font-size:1.25rem;margin:0 0 2px}h1 span{color:#C11430}"
+    + ".sub{color:#5d6068;font-size:.88rem;margin-bottom:22px}"
+    + "table{border-collapse:collapse;width:100%;font-size:.9rem;margin:14px 0}"
+    + "th,td{text-align:left;padding:7px 9px;border-bottom:1px solid #e3e3e6}"
+    + "th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#5d6068}td.n{text-align:right}"
+    + ".big{display:flex;gap:28px;margin:18px 0;flex-wrap:wrap}"
+    + ".big div b{display:block;font-size:1.5rem}.big div span{color:#5d6068;font-size:.82rem}"
+    + ".chk{margin-top:26px;padding-top:12px;border-top:1px solid #e3e3e6;font-family:Consolas,monospace;font-size:.76rem;color:#5d6068;word-break:break-all}"
+    + "</style></head><body>"
+    + "<h1>Raider Teclado <span>&mdash;</span> Spanish typing practice</h1>"
+    + "<div class='sub'>"+esc(state.name||"(no name entered)")+" &middot; "+today()
+    + " &middot; Regis Jesuit Educational Technology</div>"
+    + "<div class='big'><div><b>"+o.done+" / "+o.of+"</b><span>drills completed</span></div>"
+    + "<div><b>"+o.wpm+"</b><span>average wpm</span></div>"
+    + "<div><b>"+o.acc+"%</b><span>average accuracy</span></div>"
+    + "<div><b>"+o.mins+"</b><span>minutes practiced</span></div></div>"
+    + (sb.points ? "<p style='font-size:.9rem'><strong>Best sprint:</strong> "+sb.points+" points &middot; "
+        + sb.wpm+" wpm &middot; "+sb.cpm+" letters per minute &middot; "+sb.acc+"% accuracy ("+sb.date+")</p>" : "")
+    + "<table><thead><tr><th>Drill</th><th style='text-align:right'>Best wpm</th>"
+    + "<th style='text-align:right'>Accuracy</th><th>Last worked</th></tr></thead><tbody>"+rows+"</tbody></table>"
+    + (w.length ? "<p style='font-size:.88rem'><strong>Keys still missed most:</strong> "
+        + w.map(function(p){ return esc(p[0])+" ("+p[1]+")"; }).join(", ")+"</p>" : "")
+    + "<div class='chk'>Score code: "+esc(scoreCode())
+    + "<br>Generated by rjedtech.github.io/Raider-Clavier &mdash; figures come from this browser only.</div>"
+    + "</body></html>";
+}
+function download(filename, text, mime){
+  var blob=new Blob([text],{type:(mime||"text/plain")+";charset=utf-8"});
+  var url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },400);
+}
+function safeName(){
+  return (state.name||"student").replace(/[^A-Za-z0-9À-ɏ ]+/g,"").trim().replace(/\s+/g,"-")||"student";
+}
+
+var boardRows = [];
+var copyTo = function(){};
+function betterCode(a,b){ if(a.ok !== b.ok) return a.ok; return a.points > b.points; }
+function buildBoard(){
+  var raw = document.getElementById("boardIn").value.split(/\r?\n/);
+  var seen = {}, bad = 0, out = [];
+  raw.forEach(function(line){
+    if(!line.trim()) return;
+    var p = parseCode(line);
+    if(!p){ if(line.trim().length>4) bad++; return; }
+    var key = p.name.toLowerCase();
+    // A code that checks out always outranks one that does not, however high its points.
+    if(!seen[key] || betterCode(p, seen[key])) seen[key] = p;
+  });
+  for(var k in seen) if(seen.hasOwnProperty(k)) out.push(seen[k]);
+  var sortKey = document.getElementById("boardSort").value;
+  out.sort(function(a,b){ return b[sortKey]-a[sortKey]; });
+  boardRows = out;
+  var host = document.getElementById("boardOut");
+  if(!out.length){
+    host.innerHTML = '<p class="small muted">No valid score codes found yet.</p>';
+    document.getElementById("boardNote").textContent = bad ? bad+" line(s) did not contain a usable code." : "";
+    return;
+  }
+  var html = '<table><thead><tr><th>#</th><th>Student</th><th style="text-align:right">Points</th>'
+           + '<th style="text-align:right">wpm</th><th style="text-align:right">letters/min</th>'
+           + '<th style="text-align:right">Accuracy</th><th></th></tr></thead><tbody>';
+  out.forEach(function(r,i){
+    html += '<tr'+(i===0?' class="rank1"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td>'
+         + '<td class="num">'+r.points.toLocaleString()+'</td><td class="num">'+r.wpm+'</td>'
+         + '<td class="num">'+r.cpm+'</td><td class="num">'+r.acc+'%</td>'
+         + '<td class="tiny">'+(r.ok?'<span style="color:var(--good)">✓ checks out</span>'
+                                    :'<span style="color:var(--bad)">✗ edited</span>')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  host.innerHTML = html;
+  var badCount = out.filter(function(r){ return !r.ok; }).length;
+  document.getElementById("boardNote").textContent =
+      out.length+" student"+(out.length===1?"":"s")+" listed"
+    + (bad ? " · "+bad+" line(s) had no usable code" : "")
+    + (badCount ? " · "+badCount+" code(s) do not match their numbers" : "");
+}
+function boardCsv(){
+  var L = ["rank,student,points,wpm,letters_per_min,accuracy,code_valid"];
+  boardRows.forEach(function(r,i){
+    L.push([i+1, '"'+r.name.replace(/"/g,'""')+'"', r.points, r.wpm, r.cpm, r.acc, r.ok?"yes":"no"].join(","));
+  });
+  download("Raider-Teclado-leaderboard-"+today()+".csv", L.join("\n"), "text/csv");
+}
+
+/* ---------- 10. WIRING ----------------------------------------------------- */
+function showView(v){
+  ["practice","sprint","progress","board","cheat"].forEach(function(n){
+    document.getElementById("v-"+n).className = "view" + (n===v ? " on" : "");
+    var t = document.getElementById("t-"+n);
+    t.setAttribute("aria-selected", n===v ? "true" : "false");
+  });
+  if(v==="progress"){ renderProgress(); renderMyCode(); }
+  if(v==="sprint")  renderBadges();
+}
+function init(){
+  load();
+  // A student arriving on a teacher's link gets the list without typing anything.
+  // Must happen before renderLevels() or the Class list card never appears.
+  var shared = listFromHash();
+  if(shared){ state.custom = shared; save(); }
+  kbEl = document.getElementById("kb");
+  setLayout(state.layout);
+
+  pEng = makeEngine({
+    el:document.getElementById("target"), cap:document.getElementById("capture"),
+    showKeys:true, bar:"bar",
+    onChar:function(got, want){
+      if(!pr.started) pr.started = Date.now();
+      if(got === want){
+        pr.chars++;
+        state.cleanChars[want] = (state.cleanChars[want]||0)+1;
+      } else {
+        pr.errs++; pr.lineClean=false; pr.drillClean=false;
+        if(want!==undefined) state.weak[want] = (state.weak[want]||0)+1;
+      }
+      scheduleSave();
+      updatePracticeStats();
+    },
+    onDone:function(){ setTimeout(function(){ pr.idx++; loadLine(); }, 200); },
+    onPaste:function(){ flashNote("Pasting is off \u2014 the point is the keys."); }
+  });
+
+  sEng = makeEngine({
+    el:document.getElementById("sTarget"), cap:document.getElementById("sCapture"),
+    showKeys:false,
+    onChar:function(got, want){
+      if(!sp.on) return;
+      if(!sp.started){
+        sp.started = Date.now(); sp.endsAt = sp.started + sp.len*1000;
+        sp.tick = setInterval(sprintTick, 200);
+      }
+      if(got === want){
+        sp.chars++; sp.streak++;
+        if(sp.streak > sp.bestStreak) sp.bestStreak = sp.streak;
+        state.cleanChars[want] = (state.cleanChars[want]||0)+1;
+        var base = SPECIAL.indexOf(want) > -1 ? 25 : 10;
+        if(base===25) sp.special++;
+        var gained = Math.round(base * multiplier());
+        sp.points += gained;
+        if(base===25) floatPts(gained);
+      } else {
+        sp.errs++; sp.streak = 0;
+        sp.points = Math.max(0, sp.points-5);
+        if(want!==undefined) state.weak[want] = (state.weak[want]||0)+1;
+      }
+      scheduleSave();
+      updateSprintStats();
+    },
+    onDone:function(){ if(sp.on) setTimeout(function(){ sEng.setTarget(sprintLine(), false); sEng.focus(); }, 60); },
+    onPaste:function(){ flashNote("Pasting is off \u2014 the point is the keys."); }
+  });
+
+  renderLevels(); renderProgress(); renderBadges(); renderMyCode();
+  if(shared) flashNote("Loaded your teacher's list \u2014 " + shared.length
+                       + " item" + (shared.length===1?"":"s"));
+  paintLayout();
+  Array.prototype.forEach.call(document.querySelectorAll(".segbtn"), function(b){
+    b.addEventListener("click", function(){ setLayout(b.getAttribute("data-lay")); });
+  });
+
+  var nameIn = document.getElementById("student");
+  nameIn.value = state.name || "";
+  nameIn.addEventListener("input", function(){ state.name = nameIn.value.trim(); save(); renderMyCode(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){
+    t.addEventListener("click", function(){ showView(t.getAttribute("data-v")); });
+  });
+
+  var probe=document.getElementById("probe"), verdict=document.getElementById("verdict");
+  probe.addEventListener("input", function(){
+    var v = probe.value, p = L.probe;
+    if(!v){ verdict.className="verdict"; return; }
+    if(v === p.want || v === p.want.toUpperCase()){
+      verdict.className = "verdict ok";
+      verdict.innerHTML = p.okMsg;
+    } else if(v === p.wrong){
+      verdict.className = "verdict no";
+      verdict.innerHTML = "<strong>Not on the " + esc(L.name) + " layout yet.</strong> " + p.wrongMsg
+        + "<br>Press <kbd>Windows</kbd> + <kbd>Space</kbd> to switch, then try again."
+        + "<br><strong>Layout not in the list?</strong> Open the box just below and follow the steps.";
+      var d = document.querySelector("#installHost1 details"); if(d) d.open = true;
+    } else {
+      verdict.className = "verdict no";
+      verdict.innerHTML = "That gave \u201c" + esc(v) + "\u201d. Expected \u201c" + esc(p.want)
+        + "\u201d. Check you pressed the right key, and that the box by the clock reads <strong>"
+        + esc(L.indicator) + "</strong>.";
+    }
+  });
+  document.getElementById("probeAgain").addEventListener("click", function(){
+    probe.value=""; verdict.className="verdict"; probe.focus(); });
+
+  document.getElementById("restartBtn").addEventListener("click", function(){
+    if(pr.level) startLevel(pr.level.id); });
+  document.getElementById("skipBtn").addEventListener("click", function(){
+    if(!pr.level) return; pr.idx++; loadLine(); });
+
+  var customIn=document.getElementById("customIn"), note=document.getElementById("customNote");
+  if(state.custom){ customIn.value = state.custom.join("\n"); note.textContent = state.custom.length+" saved."; }
+  document.getElementById("saveCustom").addEventListener("click", function(){
+    var lines = customIn.value.split(/\r?\n/).map(function(s){ return s.trim(); })
+                 .filter(function(s){ return s.length>0; });
+    state.custom = lines.length ? lines : null; save(); renderLevels();
+    note.textContent = lines.length ? lines.length+" saved." : "Nothing saved.";
+  });
+  document.getElementById("clearCustom").addEventListener("click", function(){
+    state.custom=null; customIn.value=""; save(); renderLevels(); note.textContent="Removed.";
+    document.getElementById("shareLink").style.display="none";
+    document.getElementById("shareHelp").style.display="none"; });
+  document.getElementById("shareCustom").addEventListener("click", function(){
+    var lines = customIn.value.split(/\r?\n/).map(function(s){ return s.trim(); })
+                 .filter(function(s){ return s.length>0; });
+    if(!lines.length){ alert("Type or paste a list first."); return; }
+    state.custom = lines; save(); renderLevels();
+    var url = listToLink(lines);
+    var box = document.getElementById("shareLink");
+    box.textContent = url; box.style.display="block";
+    document.getElementById("shareHelp").style.display="block";
+    copyTo(url, this, "Copy student link");
+  });
+
+  document.getElementById("sprintGo").addEventListener("click", startSprint);
+
+  document.getElementById("btnReport").addEventListener("click", function(){
+    if(!state.name && !confirm("No name entered. Download the report anyway?")){
+      showView("practice"); document.getElementById("student").focus(); return; }
+    download("Raider-Teclado-"+safeName()+"-"+today()+".html", reportHtml(), "text/html");
+  });
+  document.getElementById("btnPrint").addEventListener("click", function(){ window.print(); });
+  copyTo = function(txt, btn, label){
+    function done(){ var old=btn.textContent; btn.textContent="Copied";
+      setTimeout(function(){ btn.textContent=label||old; },1600); }
+    if(navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(txt).then(done, fallback);
+    else fallback();
+    function fallback(){
+      var ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); done(); }catch(e){} document.body.removeChild(ta);
+    }
+  };
+  document.getElementById("btnCopy").addEventListener("click", function(){
+    copyTo(summaryText(), this, "Copy summary text"); });
+  document.getElementById("btnCode").addEventListener("click", function(){
+    if(!state.sprintBest || !state.sprintBest.points){ alert("Finish a sprint first."); return; }
+    copyTo(scoreCode(), this, "Copy my score code"); });
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(!confirm("Erase all saved progress in this browser? This cannot be undone.")) return;
+    var keepCustom=state.custom, keepName=state.name;
+    state = {name:keepName, best:{}, sprintBest:{}, weak:{}, cleanChars:{}, totalMs:0, sessions:0,
+             perfectDrills:0, bestStreak:0, custom:keepCustom, firstUse:today(), firstSprint:null, badges:{}};
+    save(); renderLevels(); renderProgress(); renderBadges(); renderMyCode();
+  });
+
+  document.getElementById("boardGo").addEventListener("click", buildBoard);
+  document.getElementById("boardSort").addEventListener("change", function(){ if(boardRows.length) buildBoard(); });
+  document.getElementById("boardCsv").addEventListener("click", function(){
+    if(!boardRows.length){ alert("Build the leaderboard first."); return; } boardCsv(); });
+  document.getElementById("boardBig").addEventListener("click", function(){
+    var el=document.getElementById("boardOut");
+    var big = el.className.indexOf("big-screen")>-1;
+    el.className = big ? "" : "big-screen";
+    this.textContent = big ? "Big screen" : "Normal size";
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.ctrlKey||e.altKey||e.metaKey) return;
+    if(!(e.key.length===1 || e.key==="Dead")) return;
+    var onSprint = document.getElementById("v-sprint").className.indexOf("on")>-1;
+    if(onSprint){ if(sp.on && document.activeElement!==sEng.cap) sEng.focus(); }
+    else if(pEng.target && document.activeElement!==pEng.cap &&
+            document.activeElement!==document.getElementById("student") &&
+            document.activeElement!==document.getElementById("probe") &&
+            document.activeElement.tagName!=="TEXTAREA"){ pEng.focus(); }
+  });
+}
+document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+
+<!-- Anonymous page-view count (GoatCounter): no cookies, no personal data, no form contents. -->
+<script data-goatcounter="https://rjedtech.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!--RJTOOLS-->
+<section class="rj-tools" aria-label="More RJ Ed Tech tools">
+<style>
+.rj-tools{max-width:1000px;margin:52px auto 0;padding:30px 20px 44px;border-top:1px solid rgba(128,128,128,.28);font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;box-sizing:border-box;}
+.rj-tools *{box-sizing:border-box;}
+.rj-tools h2{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#C11430;margin:0 0 16px;}
+.rj-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px;}
+.rj-tool{display:block;padding:13px 15px;border:1px solid rgba(128,128,128,.28);border-radius:8px;text-decoration:none;color:inherit;background:rgba(128,128,128,.05);transition:border-color .15s,transform .15s;}
+.rj-tool:hover{border-color:#C11430;transform:translateY(-1px);}
+.rj-tool .rj-t{font-weight:650;font-size:.95rem;display:flex;align-items:center;gap:6px;color:inherit;line-height:1.25;}
+.rj-tool .rj-arrow{color:#C11430;transition:transform .15s;font-weight:700;}
+.rj-tool:hover .rj-arrow{transform:translateX(3px);}
+.rj-tool .rj-d{font-size:.8rem;line-height:1.42;margin-top:5px;opacity:.72;}
+.rj-tool.is-here{border-color:#C11430;background:rgba(193,20,48,.10);cursor:default;}
+.rj-tool.is-here:hover{transform:none;}
+.rj-here{margin-left:auto;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#C11430;border:1px solid #C11430;border-radius:99px;padding:2px 8px;white-space:nowrap;}
+.rj-tools-foot{margin-top:18px;font-size:.72rem;opacity:.55;}
+</style>
+  <h2>More RJ Ed Tech tools</h2>
+  <div class="rj-tools-grid">
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Quiz-Builder/"><div class="rj-t">Raider Quiz Builder <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Build, expand, and convert Canvas quizzes from plain text.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Randomizer/"><div class="rj-t">Raider Randomizer <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Fair student picking, grouping, and seating shuffles.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Timer/"><div class="rj-t">Raider Timer <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Countdown, stopwatch, and station rotation for class.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Pods/"><div class="rj-t">Raider Pod Generator <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Mixed teams of four, seated so partners can actually help each other.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Roster-Hub/"><div class="rj-t">Raider Roster Hub <span class="rj-arrow">&rarr;</span></div><div class="rj-d">One class list for all your RJ tools, and ZipGrade without student names.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/MyRJScheduleCleaner/"><div class="rj-t">MyRJ Schedule Cleaner <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Import your MyRJ schedule into Outlook without looking busy all day.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/cooperative-learning-toolkit/"><div class="rj-t">Cooperative Learning Toolkit <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Every Kagan structure, method, and source in one place.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Teclado/"><div class="rj-t">Raider Teclado <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Type Spanish accents, ñ, ¿ and ¡ on a US keyboard.</div></a>
+    <div class="rj-tool is-here"><div class="rj-t">Raider Clavier<span class="rj-here">You&rsquo;re here</span></div><div class="rj-d">Type French accents on a US keyboard, AZERTY or US-International.</div></div>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Observation-Digest/"><div class="rj-t">Raider Observation Digest <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Your observation report, cut down to what was actually scored and written.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Raider-Observation-Console/"><div class="rj-t">Raider Observation Console <span class="rj-arrow">&rarr;</span></div><div class="rj-d">For chairs: the observation form showing only the elements you came to watch.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/EdTech-Status/"><div class="rj-t">EdTech Status <span class="rj-arrow">&rarr;</span></div><div class="rj-d">Live status of Regis Jesuit's ed-tech systems.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/Incoming-Raider-FAQ/"><div class="rj-t">Incoming Raider FAQ <span class="rj-arrow">&rarr;</span></div><div class="rj-d">A searchable guide for new and incoming Regis Jesuit students.</div></a>
+    <a class="rj-tool" href="https://rjedtech.github.io/New-Ignatian-Educator-FAQ/"><div class="rj-t">New Ignatian Educator FAQ <span class="rj-arrow">&rarr;</span></div><div class="rj-d">A searchable onboarding guide for teachers new to Ignatian education.</div></a>
+  </div>
+  <div class="rj-tools-foot">Regis Jesuit &middot; Educational Technology &mdash; free classroom tools that run in your browser</div>
+</section>
+<!--/RJTOOLS-->
+</body>
+</html>
