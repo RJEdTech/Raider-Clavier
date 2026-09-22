@@ -252,6 +252,7 @@ footer a{color:inherit}
 @media (max-width:560px){ .layoutbar{gap:8px} .lb-note{flex-basis:100%} }
 .ldbnote{margin-top:12px;padding:11px 13px;border-radius:9px;font-size:.86rem;line-height:1.55;
   border-left:3px solid var(--rj);background:rgba(193,20,48,.07)}
+.layhint{font-size:.84rem;line-height:1.5;opacity:.75;margin:-6px 0 14px;max-width:72ch}
 </style>
 </head>
 <body>
@@ -269,13 +270,16 @@ footer a{color:inherit}
   </header>
 
   <div class="layoutbar noprint">
-    <span class="lb-label">Your keyboard layout</span>
+    <span class="lb-label">Which keyboard do you have?</span>
     <div class="seg" role="group" aria-label="Keyboard layout">
       <button class="segbtn" type="button" data-lay="intl">US-International</button>
       <button class="segbtn" type="button" data-lay="fr">French AZERTY</button>
     </div>
     <span class="lb-note" id="layNote"></span>
   </div>
+  <p class="layhint noprint">Pick the keyboard you actually added to Windows &mdash; the drills,
+  the hints and the picture of the keyboard all change to match. Not sure which one you have?
+  The check below will tell you, and you can switch back and forth any time.</p>
 
   <div class="tabs noprint" role="tablist">
     <button class="tab" id="t-practice"  role="tab" aria-selected="true"  data-v="practice">Practice</button>
@@ -1242,6 +1246,24 @@ function paintLayout(){
   if(verdict){ verdict.className = "verdict"; }
 }
 
+
+/* Exactly two layouts, so "the other one" is unambiguous. Students often add
+   a different keyboard from the one the page opens on; say so rather than
+   letting the layout check just call them wrong. */
+function otherLayout(){
+  var other = null;
+  Object.keys(LAYOUTS).forEach(function(k){ if(k !== L.id) other = LAYOUTS[k]; });
+  return other;
+}
+function switchHint(){
+  var o = otherLayout();
+  if(!o) return "";
+  return "<br><strong>Did you install a different keyboard?</strong> If you added <em>"
+    + esc(o.name) + "</em> instead, switch this page to it with the <strong>" + esc(o.name)
+    + "</strong> button at the top \\u2014 the drills, the hints and the picture of the "
+    + "keyboard all change to match.";
+}
+
 /* Drill text is shared between layouts; prompts and drill 6 are not. */
 function promptFor(lvl){
   var p = lvl.prompt;
@@ -1913,13 +1935,14 @@ function init(){
       verdict.className = "verdict no";
       verdict.innerHTML = "<strong>Not on the " + esc(L.name) + " layout yet.</strong> " + p.wrongMsg
         + "<br>Press <kbd>Windows</kbd> + <kbd>Space</kbd> to switch, then try again."
-        + "<br><strong>Layout not in the list?</strong> Open the box just below and follow the steps.";
+        + switchHint()
+        + "<br><strong>Layout not in the list at all?</strong> Open the box just below and follow the steps.";
       var d = document.querySelector("#installHost1 details"); if(d) d.open = true;
     } else {
       verdict.className = "verdict no";
       verdict.innerHTML = "That gave \u201c" + esc(v) + "\u201d. Expected \u201c" + esc(p.want)
         + "\u201d. Check you pressed the right key, and that the box by the clock reads <strong>"
-        + esc(L.indicator) + "</strong>.";
+        + esc(L.indicator) + "</strong>." + switchHint();
     }
   });
   document.getElementById("probeAgain").addEventListener("click", function(){
