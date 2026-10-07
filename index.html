@@ -17,6 +17,7 @@
 })();
 </script>
 <style>
+:root{--rj:#C11430}
 :root{
   --red:#C11430;
   --bg:#f6f6f7; --panel:#ffffff; --ink:#1b1c1f; --muted:#5d6068;
@@ -289,6 +290,19 @@ body.fs .rj-masthead::before{display:none}
 @media(max-width:600px){.rj-masthead .brand,.rj-masthead h1{font-size:17px!important}.rj-masthead>label{flex-basis:100%}}
 @media print{.rj-masthead::before{display:none}.rj-masthead,.rj-masthead .brand,.rj-masthead h1{color:#000!important;-webkit-text-fill-color:#000!important}}
 /*/RJMASTHEAD*/
+
+/*RJCONTRAST*/
+/* Readability: text colours lifted to WCAG AA contrast (4.5:1) in each theme */
+:where([data-theme="dark"]) .tab[aria-selected="true"]{color:#ed516a}
+:where([data-theme="dark"]) h3{color:#ee5e76}
+:where([data-theme="dark"]) details.install > summary{color:#ef6178}
+:where([data-theme="dark"]) .yesno b{color:#f06c82}
+:where([data-theme="dark"]) .panel a{color:#ef6178}
+[data-theme="dark"] .rj-lang h2{color:#ed516a}
+[data-theme="dark"] .rj-l-here{color:#ee5870}
+[data-theme="dark"] [style*="var(--rj)"]{color:#ee5e76!important}
+[data-theme="dark"] .lb-label{color:#ee5e76!important}
+/*/RJCONTRAST*/
 </style>
 </head>
 <body>
